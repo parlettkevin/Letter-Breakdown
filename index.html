@@ -1054,14 +1054,19 @@ function loadDefaults(){
 }
 
 function populateMonths(){
+  const today = new Date();
+  /* Before the 10th → close end of current month; on/after the 10th → end of next month */
+  const offset = today.getDate() < 10 ? 1 : 2;
+  const targetDate = new Date(today.getFullYear(), today.getMonth() + offset, 0);
+  const targetMonth = targetDate.getMonth() + 1; // 1-indexed
   const sel = $('closing-month');
-  const curMonth = new Date().getMonth()+1;
   MONTH_NAMES.forEach((name,i)=>{
     const o = document.createElement('option');
     o.value = i+1; o.textContent = name;
-    if (i+1 === curMonth) o.selected = true;
+    if (i+1 === targetMonth) o.selected = true;
     sel.appendChild(o);
   });
+  $('closing-day').value = targetDate.getDate();
 }
 
 function fmtDate(d){
