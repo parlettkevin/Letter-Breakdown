@@ -905,27 +905,24 @@ function buildCopyText(){
     'PROPERTY: ' + (addr || 'Property Address'),
     '',
     'LOAN OVERVIEW',
-    '* Purchase Price: ' + money(c.price),
-    '* Down Payment: ' + money(c.downPayment) + ' (' + pct(c.downPct * 100) + '%)',
-    '* Loan Amount: ' + money(c.totalLoan) + ' (' + c.loanType + ')',
-    '* Interest Rate: ' + pct(c.rate * 100) + '% (' + c.termYears + '-Year Fixed)',
+    'Purchase Price: ' + money(c.price),
+    'Down Payment: ' + money(c.downPayment) + ' (' + pct(c.downPct * 100) + '%)',
+    'Loan Amount: ' + money(c.totalLoan) + ' (' + c.loanType + ')',
+    'Rate: ' + pct(c.rate * 100) + '% · ' + c.termYears + '-Year Fixed',
     '',
-    'ESTIMATED MONTHLY PAYMENT',
-    '* Principal & Interest: ' + money(c.pi),
-    '* Property Taxes: ' + money(c.taxMonthly),
-    '* Homeowners Insurance: ' + money(c.hazardMonthly),
-    '* Mortgage Insurance (PMI/MIP): ' + money(c.miMonthly || 0),
-    '* HOA Dues: ' + money(c.hoaMonthly || 0),
-    '* TOTAL MONTHLY PAYMENT: ' + money(c.totalMonthly),
+    'MONTHLY PAYMENT: ' + money(c.totalMonthly),
+    'P&I: ' + money(c.pi),
+    'Taxes: ' + money(c.taxMonthly),
+    'Home Insurance: ' + money(c.hazardMonthly),
+    'PMI/MIP: ' + money(c.miMonthly || 0),
+    'HOA: ' + money(c.hoaMonthly || 0),
     '',
-    'CASH TO CLOSE',
-    '* Down Payment: ' + money(c.downPayment),
-    '* Est. Closing Costs & Prepaids: ' + money(grossClosing),
+    'CASH TO CLOSE: ' + money(c.cashToClose),
+    'Down Payment: ' + money(c.downPayment),
+    'Closing Costs: ' + money(grossClosing),
   ];
 
-  if (Math.round(credits * 100) > 0) lines.push('* Seller/Lender Credits: -' + money(credits));
-
-  lines.push('* TOTAL CASH REQUIRED: ' + money(c.cashToClose));
+  if (Math.round(credits * 100) > 0) lines.push('Seller Credits: -' + money(credits));
 
   return lines.join('\n');
 }
