@@ -40,6 +40,9 @@
 details.dml-card summary{cursor:pointer;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#9a958a;}
 details.dml-card[open] summary{margin-bottom:10px;}
 .dml-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.dml-price-wrap{position:relative;}
+.dml-price-prefix{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:14.5px;color:#5a564d;pointer-events:none;user-select:none;}
+.dml-price-wrap input{padding-left:20px!important;}
 .dml-sticky-bar{position:sticky;bottom:0;background:#fff;padding:10px 0 max(env(safe-area-inset-bottom),6px);border-top:1px solid #e7e3da;z-index:10;margin-top:12px;}
 .dml-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 </style>
@@ -71,7 +74,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
 <div class="dml-card">
   <p class="dml-h">Loan basics</p>
   <div class="dml-row">
-    <div><label class="dml-label">Purchase price</label><input type="number" id="price" autocomplete="off" oninput="onPriceInput()"></div>
+    <div><label class="dml-label">Purchase price</label><div class="dml-price-wrap"><span class="dml-price-prefix">$</span><input type="text" inputmode="numeric" id="price" autocomplete="off" oninput="onPriceInput()"></div></div>
     <div><label class="dml-label">Loan type</label>
       <select id="loan-type" autocomplete="off" onchange="onLoanTypeChange()">
         <option value="FHA">FHA</option>
@@ -371,7 +374,7 @@ function dynamicClosingCostsTotal(){
 
 /* ---------- helpers ---------- */
 function $(id){ return document.getElementById(id); }
-function num(id){ const v = parseFloat($(id).value); return isNaN(v) ? 0 : v; }
+function num(id){ const v = parseFloat($(id).value.replace(/,/g,'')); return isNaN(v) ? 0 : v; }
 function fmt(n){ return n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
 function money(n){ return (n<0 ? '-$' : '$') + fmt(Math.abs(n)); }
 function pct(n){ return Math.round(n*1000)/1000; }
@@ -571,6 +574,9 @@ function autoFillOwnerTitle(){
 
 /* ---------- field-level input handlers ---------- */
 function onPriceInput(){
+  const el = $('price');
+  const raw = el.value.replace(/[^0-9]/g, '');
+  el.value = raw ? parseInt(raw, 10).toLocaleString('en-US') : '';
   autoFillClosingCosts();
   autoEstimateTaxFromPrice();
   autoFillLenderTitle();
