@@ -186,14 +186,6 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <div><label class="dml-label">Assets verified</label><input type="date" id="assets-date" autocomplete="off"></div>
     <div><label class="dml-label">Credit verified</label><input type="date" id="credit-date" autocomplete="off"></div>
   </div>
-  <div class="dml-row" style="margin-top:10px;margin-bottom:0;">
-    <div><label class="dml-label">Signing loan officer</label>
-      <select id="signer" autocomplete="off">
-        <option value="kevin">Kevin Parlett</option>
-        <option value="corey">Corey Glowacki</option>
-      </select>
-    </div>
-  </div>
 </div>
 
 <div id="status-msg" style="display:none;background:#fff4e8;border:1px solid #f4c98a;color:#7a4a10;font-size:13.5px;padding:10px 12px;border-radius:8px;margin-bottom:12px;"></div>
@@ -245,10 +237,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <div class="dml-small">Includes down payment.</div>
   </div>
 
-  <div class="dml-grid2">
-    <button type="button" class="dml-btn dml-btn-secondary" id="copy-md-btn" onclick="copyText('md')">Copy markdown</button>
-    <button type="button" class="dml-btn dml-btn-secondary" id="copy-plain-btn" onclick="copyText('plain')">Copy plain text</button>
-  </div>
+  <button type="button" class="dml-btn dml-btn-secondary" id="copy-btn" onclick="copyText()">Copy Text</button>
   <div style="height:10px;"></div>
   <div class="dml-card">
     <p class="dml-h">Download options</p>
@@ -259,6 +248,14 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <div class="dml-check">
       <input type="radio" name="summary-layout" id="layout-2" value="2">
       <label for="layout-2">Address, Loan Type &amp; Purchase Price</label>
+    </div>
+    <div class="dml-row" style="margin-top:10px;margin-bottom:0;">
+      <div><label class="dml-label">Signing loan officer</label>
+        <select id="signer" autocomplete="off">
+          <option value="kevin">Kevin Parlett</option>
+          <option value="corey">Corey Glowacki</option>
+        </select>
+      </div>
     </div>
     <div style="height:10px;"></div>
     <button type="button" class="dml-btn" onclick="generateLetter()">Download preapproval letter (PDF)</button>
@@ -894,72 +891,52 @@ function renderResults(){
 function cNumFmt(c){ return num('cushion-cap-months') || 2; }
 
 /* ---------- copy ---------- */
-function buildText(){
+function buildCopyText(){
   const c = window.__lastCalc;
   if (!c) return '';
   const addr = getAddress();
-  let t = '';
-  t += addr + '\n\n';
-  t += 'Loan Overview\n';
-  t += 'Purchase Price: ' + money(c.price) + '\n';
-  t += 'Down Payment: ' + money(c.downPayment) + ' (' + pct(c.downPct*100) + '%)\n';
-  t += 'Loan Amount: ' + money(c.totalLoan) + ' (' + c.loanType + ')\n';
-  t += 'Rate: ' + pct(c.rate*100) + '%\n';
-  t += 'Term: ' + c.termYears + ' years\n\n';
-  t += 'Monthly Payment\n';
-  t += 'P&I: ' + money(c.pi) + '\n';
-  t += 'Hazard: ' + money(c.hazardMonthly) + '\n';
-  t += 'Taxes: ' + money(c.taxMonthly) + '\n';
-  if (c.miMonthly) t += 'MIP: ' + money(c.miMonthly) + '\n';
-  if (c.hoaMonthly) t += 'HOA: ' + money(c.hoaMonthly) + '\n';
-  t += 'Total: ' + money(c.totalMonthly) + '\n\n';
-  t += 'Cash to Close\n';
-  t += 'Closing Costs: ' + money(c.closingCosts) + '\n';
-  t += 'Title & Settlement: ' + money(c.lenderTitle + c.ownerTitle + c.titleSettlementTotal) + '\n';
-  t += 'Transfer Taxes: ' + money(c.transferTotal) + '\n';
-  t += 'Prepaids/Reserves: ' + money(c.reservesTotal) + '\n';
-  if (c.dpa) t += 'DPA (' + $('dpa-pct').value + '% MMP): -' + money(c.dpa) + '\n';
-  if (c.sellerCredit) t += 'Seller Credit: -' + money(c.sellerCredit) + '\n';
-  t += 'Total: ' + money(c.cashToClose) + ' (includes down payment)\n';
-  return t;
+
+  const grossClosing = c.closingCosts + c.lenderTitle + c.ownerTitle +
+                       c.titleSettlementTotal + c.transferTotal +
+                       c.reservesTotal + c.discountPointsAmount;
+  const credits = (c.downPayment + grossClosing) - c.cashToClose;
+
+  const lines = [
+    'PROPERTY: ' + (addr || 'Property Address'),
+    '',
+    'LOAN OVERVIEW',
+    '* Purchase Price: ' + money(c.price),
+    '* Down Payment: ' + money(c.downPayment) + ' (' + pct(c.downPct * 100) + '%)',
+    '* Loan Amount: ' + money(c.totalLoan) + ' (' + c.loanType + ')',
+    '* Interest Rate: ' + pct(c.rate * 100) + '% (' + c.termYears + '-Year Fixed)',
+    '',
+    'ESTIMATED MONTHLY PAYMENT',
+    '* Principal & Interest: ' + money(c.pi),
+    '* Property Taxes: ' + money(c.taxMonthly),
+    '* Homeowners Insurance: ' + money(c.hazardMonthly),
+    '* Mortgage Insurance (PMI/MIP): ' + money(c.miMonthly || 0),
+    '* HOA Dues: ' + money(c.hoaMonthly || 0),
+    '* **TOTAL MONTHLY PAYMENT: ' + money(c.totalMonthly) + '**',
+    '',
+    'CASH TO CLOSE',
+    '* Down Payment: ' + money(c.downPayment),
+    '* Est. Closing Costs & Prepaids: ' + money(grossClosing),
+  ];
+
+  if (credits > 0) lines.push('* Seller/Lender Credits: -' + money(credits));
+
+  lines.push('* **TOTAL CASH REQUIRED: ' + money(c.cashToClose) + '**');
+
+  return lines.join('\n');
 }
 
-function buildMarkdown(){
-  const c = window.__lastCalc;
-  if (!c) return '';
-  const addr = getAddress();
-  let t = '';
-  t += '**Loan Overview**\n';
-  t += '- Purchase Price: ' + money(c.price) + '\n';
-  t += '- Down Payment: ' + money(c.downPayment) + ' (' + pct(c.downPct*100) + '%)\n';
-  t += '- Loan Amount: ' + money(c.totalLoan) + ' (' + c.loanType + ')\n';
-  t += '- Rate: ' + pct(c.rate*100) + '%\n';
-  t += '- Term: ' + c.termYears + ' years\n\n';
-  t += '**Monthly Payment**\n';
-  t += '- P&I: ' + money(c.pi) + '\n';
-  t += '- Hazard: ' + money(c.hazardMonthly) + '\n';
-  t += '- Taxes: ' + money(c.taxMonthly) + '\n';
-  if (c.miMonthly) t += '- MIP: ' + money(c.miMonthly) + '\n';
-  if (c.hoaMonthly) t += '- HOA: ' + money(c.hoaMonthly) + '\n';
-  t += '- **Total: ' + money(c.totalMonthly) + '**\n\n';
-  t += '**Cash to Close**\n';
-  t += '- Closing Costs: ' + money(c.closingCosts) + '\n';
-  t += '- Title & Settlement: ' + money(c.lenderTitle + c.ownerTitle + c.titleSettlementTotal) + '\n';
-  t += '- Transfer Taxes: ' + money(c.transferTotal) + '\n';
-  t += '- Prepaids/Reserves: ' + money(c.reservesTotal) + '\n';
-  if (c.dpa) t += '- DPA (' + $('dpa-pct').value + '% MMP): -' + money(c.dpa) + '\n';
-  if (c.sellerCredit) t += '- Seller Credit: -' + money(c.sellerCredit) + '\n';
-  t += '- **Total: ' + money(c.cashToClose) + '** (includes down payment)\n\n';
-  t += addr + '\n';
-  return t;
-}
-
-function copyText(kind){
-  const txt = kind==='md' ? buildMarkdown() : buildText();
+function copyText(){
+  const txt = buildCopyText();
+  if (!txt) return;
   navigator.clipboard.writeText(txt).then(()=>{
-    const btn = kind==='md' ? $('copy-md-btn') : $('copy-plain-btn');
+    const btn = $('copy-btn');
     const orig = btn.textContent;
-    btn.textContent = 'Copied';
+    btn.textContent = 'Copied!';
     setTimeout(()=>{ btn.textContent = orig; }, 1500);
   });
 }
