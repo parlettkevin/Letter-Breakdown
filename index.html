@@ -65,7 +65,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
   <div class="dml-grid3">
     <div><label class="dml-label">City</label><input type="text" id="p-city" autocomplete="off" autocapitalize="words" oninput="onCityInput()" onblur="titleCaseCity()"></div>
     <div><label class="dml-label">State</label><input type="text" id="p-state" value="MD" autocomplete="off"></div>
-    <div><label class="dml-label">Zip</label><input type="text" id="p-zip" inputmode="numeric" autocomplete="off" oninput="onZipInput()"></div>
+    <div><label class="dml-label">Zip <span style="font-weight:400;font-size:11px;color:#9e9b95;">— auto-fills city</span></label><input type="text" id="p-zip" inputmode="numeric" autocomplete="off" oninput="onZipInput()"></div>
   </div>
   <div class="dml-small" id="zip-city-note"></div>
   <div class="dml-small" style="margin-top:6px;">Look up assessed value: <a href="https://sdat.dat.maryland.gov/RealProperty/Pages/default.aspx" target="_blank" rel="noopener">MD SDAT Real Property Search</a></div>
@@ -916,16 +916,16 @@ function buildCopyText(){
     '* Homeowners Insurance: ' + money(c.hazardMonthly),
     '* Mortgage Insurance (PMI/MIP): ' + money(c.miMonthly || 0),
     '* HOA Dues: ' + money(c.hoaMonthly || 0),
-    '* **TOTAL MONTHLY PAYMENT: ' + money(c.totalMonthly) + '**',
+    '* TOTAL MONTHLY PAYMENT: ' + money(c.totalMonthly),
     '',
     'CASH TO CLOSE',
     '* Down Payment: ' + money(c.downPayment),
     '* Est. Closing Costs & Prepaids: ' + money(grossClosing),
   ];
 
-  if (credits > 0) lines.push('* Seller/Lender Credits: -' + money(credits));
+  if (Math.round(credits * 100) > 0) lines.push('* Seller/Lender Credits: -' + money(credits));
 
-  lines.push('* **TOTAL CASH REQUIRED: ' + money(c.cashToClose) + '**');
+  lines.push('* TOTAL CASH REQUIRED: ' + money(c.cashToClose));
 
   return lines.join('\n');
 }
@@ -933,12 +933,26 @@ function buildCopyText(){
 function copyText(){
   const txt = buildCopyText();
   if (!txt) return;
-  navigator.clipboard.writeText(txt).then(()=>{
+  const flash = () => {
     const btn = $('copy-btn');
     const orig = btn.textContent;
     btn.textContent = 'Copied!';
     setTimeout(()=>{ btn.textContent = orig; }, 1500);
-  });
+  };
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try{ document.execCommand('copy'); flash(); }catch(e){}
+    document.body.removeChild(ta);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(flash).catch(fallback);
+  } else {
+    fallback();
+  }
 }
 
 
@@ -981,6 +995,50 @@ function loadDefaults(){
   }catch(e){ /* first run, or storage unavailable, ignore */ }
 }
 
+function saveSession(){
+  try{
+    const s = {
+      price:      $('price').value,
+      street:     $('p-street').value,
+      city:       $('p-city').value,
+      state:      $('p-state').value,
+      zip:        $('p-zip').value,
+      borrower:   $('borrower-name').value,
+      loanType:   $('loan-type').value,
+      downPct:    $('down-pct').value,
+      dpaEnable:  $('dpa-enable').checked,
+      letterDate: $('letter-date').value,
+      incomeDate: $('income-date').value,
+      assetsDate: $('assets-date').value,
+      creditDate: $('credit-date').value,
+      validDays:  $('valid-days').value
+    };
+    localStorage.setItem('dml-session', JSON.stringify(s));
+  }catch(e){}
+}
+
+function loadSession(){
+  try{
+    const raw = localStorage.getItem('dml-session');
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (s.price)      $('price').value      = s.price;
+    if (s.street)     $('p-street').value   = s.street;
+    if (s.city)       $('p-city').value     = s.city;
+    if (s.state)      $('p-state').value    = s.state;
+    if (s.zip)        $('p-zip').value      = s.zip;
+    if (s.borrower)   $('borrower-name').value = s.borrower;
+    if (s.loanType){  $('loan-type').value  = s.loanType; onLoanTypeChange(); }
+    if (s.downPct)    $('down-pct').value   = s.downPct;
+    if (s.dpaEnable !== undefined){ $('dpa-enable').checked = s.dpaEnable; onDpaToggle(); }
+    if (s.letterDate) $('letter-date').value = s.letterDate;
+    if (s.incomeDate) $('income-date').value = s.incomeDate;
+    if (s.assetsDate) $('assets-date').value = s.assetsDate;
+    if (s.creditDate) $('credit-date').value = s.creditDate;
+    if (s.validDays)  $('valid-days').value  = s.validDays;
+  }catch(e){}
+}
+
 function populateMonths(){
   const today = new Date();
   /* Before the 10th → close end of current month; on/after the 10th → end of next month */
@@ -1008,9 +1066,18 @@ function addDays(d, days){
 
 function generateLetter(){
   showStatus('');
-  const c = window.__lastCalc;
-  if (!c){ showStatus('Tap Calculate first, then come back to generate the letter.'); return; }
   if (!window.jspdf){ showStatus('PDF library still loading, give it a second and tap again.'); return; }
+  const c = window.__lastCalc || (() => {
+    const price    = num('price');
+    const downPct  = num('down-pct') / 100;
+    const baseLoan = Math.floor(price * (1 - downPct));
+    const dpaOn    = $('dpa-enable').checked;
+    return {
+      price,
+      loanType: $('loan-type').value,
+      dpa: dpaOn ? Math.floor(baseLoan * (num('dpa-pct') / 100 || 0.03)) : 0
+    };
+  })();
 
   const name = $('borrower-name').value.trim() || 'Borrower Name';
   const addr = getAddress() || 'Property Address';
@@ -1173,6 +1240,9 @@ onDpaToggle();
 setDefaultDates();
 loadDefaults();
 initZipCache();
+loadSession();
+document.addEventListener('input',  saveSession);
+document.addEventListener('change', saveSession);
 </script>
 </div>
 </body>
