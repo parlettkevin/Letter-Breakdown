@@ -241,6 +241,21 @@ details.dml-card[open] summary{margin-bottom:10px;}
   <div style="height:10px;"></div>
   <button type="button" class="dml-btn" onclick="generateLetter()">Download preapproval letter (PDF)</button>
   <div id="pdf-output" style="display:none;margin-top:12px;"></div>
+
+  <div style="height:10px;"></div>
+  <div class="dml-card">
+    <p class="dml-h">Summary export</p>
+    <div class="dml-check">
+      <input type="radio" name="summary-layout" id="layout-1" value="1" checked>
+      <label for="layout-1">Address &amp; Loan Type Only</label>
+    </div>
+    <div class="dml-check">
+      <input type="radio" name="summary-layout" id="layout-2" value="2">
+      <label for="layout-2">Address, Loan Type &amp; Purchase Price</label>
+    </div>
+    <div style="height:8px;"></div>
+    <button type="button" class="dml-btn dml-btn-secondary" onclick="downloadSummary()">&#x1F4E5; Download Summary</button>
+  </div>
 </div>
 
 </div>
@@ -936,6 +951,36 @@ function copyText(kind){
     btn.textContent = 'Copied';
     setTimeout(()=>{ btn.textContent = orig; }, 1500);
   });
+}
+
+function downloadSummary(){
+  const addr = getAddress() || 'Property Address';
+  const loanType = $('loan-type').value;
+  const layout = document.querySelector('input[name="summary-layout"]:checked').value;
+  const priceRaw = parseFloat($('price').value);
+
+  let text = 'Pre-Approval Summary for ' + addr + '\n\n';
+  text += 'Loan Type: ' + loanType + '\n\n';
+  if (layout === '2' && priceRaw > 0){
+    text += 'Purchase Price: ' + money(priceRaw) + '\n\n';
+  }
+
+  const fileName = 'Pre-Approval Summary.txt';
+  const blob = new Blob([text], {type:'text/plain'});
+  const file = new File([blob], fileName, {type:'text/plain'});
+
+  if (navigator.canShare && navigator.canShare({files:[file]})){
+    navigator.share({files:[file], title:fileName}).catch(()=>{});
+  } else {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }
 }
 
 function getAddress(){
