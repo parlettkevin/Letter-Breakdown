@@ -52,16 +52,16 @@ details.dml-card[open] summary{margin-bottom:10px;}
   <p class="dml-h">Borrower &amp; property</p>
   <div class="dml-row"><div>
     <label class="dml-label">Borrower name</label>
-    <input type="text" id="borrower-name" placeholder="Jane Smith" autocomplete="off">
+    <input type="text" id="borrower-name" autocomplete="off">
   </div></div>
   <div class="dml-row"><div>
     <label class="dml-label">Street address</label>
-    <input type="text" id="p-street" placeholder="124 Main St" autocomplete="off">
+    <input type="text" id="p-street" autocomplete="off">
   </div></div>
   <div class="dml-grid3">
-    <div><label class="dml-label">City</label><input type="text" id="p-city" placeholder="City" autocomplete="off" autocapitalize="words" oninput="onCityInput()" onblur="titleCaseCity()"></div>
-    <div><label class="dml-label">State</label><input type="text" id="p-state" placeholder="MD" value="MD" autocomplete="off"></div>
-    <div><label class="dml-label">Zip</label><input type="text" id="p-zip" inputmode="numeric" placeholder="21014" autocomplete="off" oninput="onZipInput()"></div>
+    <div><label class="dml-label">City</label><input type="text" id="p-city" autocomplete="off" autocapitalize="words" oninput="onCityInput()" onblur="titleCaseCity()"></div>
+    <div><label class="dml-label">State</label><input type="text" id="p-state" value="MD" autocomplete="off"></div>
+    <div><label class="dml-label">Zip</label><input type="text" id="p-zip" inputmode="numeric" autocomplete="off" oninput="onZipInput()"></div>
   </div>
   <div class="dml-small" id="zip-city-note"></div>
 </div>
@@ -69,7 +69,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
 <div class="dml-card">
   <p class="dml-h">Loan basics</p>
   <div class="dml-row">
-    <div><label class="dml-label">Purchase price</label><input type="number" id="price" placeholder="415000" autocomplete="off" oninput="onPriceInput()"></div>
+    <div><label class="dml-label">Purchase price</label><input type="number" id="price" autocomplete="off" oninput="onPriceInput()"></div>
     <div><label class="dml-label">Loan type</label>
       <select id="loan-type" autocomplete="off" onchange="onLoanTypeChange()">
         <option value="FHA">FHA</option>
@@ -80,20 +80,20 @@ details.dml-card[open] summary{margin-bottom:10px;}
   </div>
   <div class="dml-row">
     <div><label class="dml-label">Down payment %</label><input type="number" step="0.01" id="down-pct" value="3.5" autocomplete="off" oninput="onDownPctInput()"></div>
-    <div><label class="dml-label">Rate %</label><input type="number" step="0.001" id="rate" placeholder="6.75" autocomplete="off"></div>
-    <div><label class="dml-label">Term (yrs)</label><input type="number" id="term" placeholder="30" autocomplete="off"></div>
+    <div><label class="dml-label">Rate %</label><input type="number" step="0.001" id="rate" autocomplete="off"></div>
+    <div><label class="dml-label">Term (yrs)</label><input type="number" id="term" autocomplete="off"></div>
   </div>
 
   <div id="fha-row" class="dml-row">
-    <div><label class="dml-label">UFMIP %</label><input type="number" step="0.01" id="ufmip-pct" placeholder="1.75" autocomplete="off"></div>
+    <div><label class="dml-label">UFMIP %</label><input type="number" step="0.01" id="ufmip-pct" autocomplete="off"></div>
     <div class="dml-check" style="margin-top:22px;"><input type="checkbox" id="finance-ufmip" checked><label for="finance-ufmip">Finance UFMIP into loan</label></div>
   </div>
   <div id="va-row" class="dml-row" style="display:none;">
-    <div><label class="dml-label">VA funding fee %</label><input type="number" step="0.01" id="funding-fee-pct" placeholder="2.15" autocomplete="off"></div>
+    <div><label class="dml-label">VA funding fee %</label><input type="number" step="0.01" id="funding-fee-pct" autocomplete="off"></div>
     <div class="dml-check" style="margin-top:22px;"><input type="checkbox" id="finance-funding-fee" checked><label for="finance-funding-fee">Finance funding fee</label></div>
   </div>
   <div id="conv-row" class="dml-row" style="display:none;">
-    <div><label class="dml-label">Monthly PMI $</label><input type="number" id="pmi-monthly" placeholder="0" autocomplete="off"></div>
+    <div><label class="dml-label">Monthly PMI $</label><input type="number" id="pmi-monthly" autocomplete="off"></div>
   </div>
 
   <div class="dml-check"><input type="checkbox" id="dpa-enable" onchange="onDpaToggle()"><label for="dpa-enable">Include down payment assistance (MMP)</label></div>
@@ -103,14 +103,14 @@ details.dml-card[open] summary{margin-bottom:10px;}
 <div class="dml-card">
   <p class="dml-h">Recurring monthly costs</p>
   <div class="dml-row">
-    <div><label class="dml-label">Annual property tax $</label><input type="number" id="tax-annual" placeholder="4500" autocomplete="off" oninput="onTaxAnnualInput()"></div>
+    <div><label class="dml-label">Annual property tax $</label><input type="number" id="tax-annual" autocomplete="off" oninput="onTaxAnnualInput()"></div>
   </div>
   <div class="dml-small" id="tax-estimate-note"></div>
   <details style="margin-top:8px;">
     <summary style="font-size:12.5px;color:#5a564d;cursor:pointer;">Don't have the tax bill? Estimate from assessed value</summary>
     <div class="dml-row" style="margin-top:10px;">
       <div><label class="dml-label">County</label><select id="county" autocomplete="off" onchange="onCountyChange()"></select></div>
-      <div><label class="dml-label">Assessed value $</label><input type="number" id="assessed-value" placeholder="240000" autocomplete="off"></div>
+      <div><label class="dml-label">Assessed value $</label><input type="number" id="assessed-value" autocomplete="off"></div>
     </div>
     <div id="harford-town-row" class="dml-row" style="display:none;">
       <div><label class="dml-label">Town (Harford only)</label>
@@ -120,7 +120,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <button type="button" class="dml-btn dml-btn-secondary" onclick="estimateTax()">Estimate tax</button>
   </details>
   <div class="dml-row" style="margin-top:12px;">
-    <div><label class="dml-label">Hazard insurance $/mo</label><input type="number" id="hazard-monthly" placeholder="125" autocomplete="off"></div>
+    <div><label class="dml-label">Hazard insurance $/mo</label><input type="number" id="hazard-monthly" autocomplete="off"></div>
     <div><label class="dml-label">HOA $/mo</label><input type="number" id="hoa-monthly" value="0" autocomplete="off"></div>
   </div>
 </div>
@@ -128,14 +128,14 @@ details.dml-card[open] summary{margin-bottom:10px;}
 <div class="dml-card">
   <p class="dml-h">Closing costs</p>
   <div class="dml-row">
-    <div><label class="dml-label">Lender fees, title &amp; settlement (excl. transfer)</label><input type="number" id="closing-costs" placeholder="5598.00" autocomplete="off" oninput="onClosingCostsInput()"></div>
+    <div><label class="dml-label">Lender fees, title &amp; settlement (excl. transfer)</label><input type="number" id="closing-costs" autocomplete="off" oninput="onClosingCostsInput()"></div>
   </div>
   <div class="dml-small" id="closing-costs-note"></div>
   <div class="dml-small" id="fee-breakdown"></div>
   <div class="dml-small">Placeholder is the typical flat lender/vendor fee total (origination, underwriting, appraisal, credit report, settlement, etc.). Origination scales with the loan amount; the other lender/vendor fees below are flat dollar fees in practice. Title insurance and transfer tax, the pieces that also scale with price, are their own fields below.</div>
   <div class="dml-row">
-    <div><label class="dml-label">Lender's title insurance</label><input type="number" id="lender-title" placeholder="275.00" autocomplete="off" oninput="onLenderTitleInput()"></div>
-    <div><label class="dml-label">Owner's title insurance</label><input type="number" id="owner-title" placeholder="2109.00" autocomplete="off" oninput="onOwnerTitleInput()"></div>
+    <div><label class="dml-label">Lender's title insurance</label><input type="number" id="lender-title" autocomplete="off" oninput="onLenderTitleInput()"></div>
+    <div><label class="dml-label">Owner's title insurance</label><input type="number" id="owner-title" autocomplete="off" oninput="onOwnerTitleInput()"></div>
   </div>
   <div class="dml-small" id="title-note">Auto-estimated from Old Republic Title's published MD rate schedule (effective 1/1/2025): owner's policy is tiered by purchase price ($5.40/$1,000 up to $250K, $4.60/$1,000 above), lender's policy is a flat $275 when issued simultaneously with the owner's policy. Maryland is a filed-rate state, so your title company's actual underwriter may differ, swap in the real quote when you have it.</div>
   <div class="dml-row">
@@ -154,7 +154,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <div><label class="dml-label">Estimated closing month</label>
       <select id="closing-month" autocomplete="off"></select>
     </div>
-    <div><label class="dml-label">Day of month</label><input type="number" id="closing-day" min="1" max="31" placeholder="15" autocomplete="off"></div>
+    <div><label class="dml-label">Day of month</label><input type="number" id="closing-day" min="1" max="31" autocomplete="off"></div>
   </div>
   <div class="dml-small">Drives prepaid interest days, the hazard insurance escrow cushion, and the property tax escrow deposit (sized off Maryland's 7/1 and 12/1 semiannual due dates, RESPA's lowest-balance method).</div>
 </div>
@@ -162,7 +162,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
 <details class="dml-card">
   <summary>Escrow cushion cap (advanced)</summary>
   <div class="dml-row" style="margin-top:10px;">
-    <div><label class="dml-label">Max cushion, months (RESPA cap is 2)</label><input type="number" id="cushion-cap-months" placeholder="2" autocomplete="off"></div>
+    <div><label class="dml-label">Max cushion, months (RESPA cap is 2)</label><input type="number" id="cushion-cap-months" autocomplete="off"></div>
   </div>
 </details>
 
@@ -272,6 +272,10 @@ const HARFORD_TOWNS = {
    Covers all 21 Harford County ZIPs plus the most common Baltimore County
    ZIPs near the Harford line. Not exhaustive (Baltimore County alone has
    ~65 ZIPs) by design, see chat for the tradeoffs on out-of-area ZIPs. */
+/* Hybrid ZIP lookup: local entries hit instantly; unknown ZIPs fall through
+   to Zippopotam.us so any US ZIP code works without bloating this file. */
+const ZIP_CACHE = {};
+
 const ZIP_CITY_MAP = {
   /* Harford County */
   "21001":"Aberdeen", "21005":"Aberdeen Proving Ground", "21009":"Abingdon",
@@ -559,20 +563,50 @@ function titleCaseCity(){
     return lw.charAt(0).toUpperCase() + lw.slice(1);
   }).join(' ');
 }
-function onZipInput(){
+async function onZipInput(){
   const note = $('zip-city-note');
   const digits = $('p-zip').value.replace(/\D/g,'');
   if (digits.length < 5){
     if (note) note.textContent = '';
     return;
   }
-  const match = ZIP_CITY_MAP[digits.slice(0,5)];
-  if (match){
-    if (!fieldLock.city) $('p-city').value = match;
+  const zip5 = digits.slice(0,5);
+
+  /* Cache hit \u2014 local MD entries are pre-seeded; API results land here too */
+  if (ZIP_CACHE[zip5]){
+    if (!fieldLock.city) $('p-city').value = ZIP_CACHE[zip5];
     if (note) note.textContent = '';
-  } else if (note) {
-    note.textContent = 'Zip not in our local Harford/Baltimore Co. list \u2014 enter city manually.';
+    return;
   }
+
+  /* Cache miss \u2014 try Zippopotam.us (no key, free, all US ZIPs) */
+  if (note) note.textContent = 'Looking up ZIP\u2026';
+  try {
+    const city = await fetchCityFromZip(zip5);
+    ZIP_CACHE[zip5] = city;
+    if (!fieldLock.city) $('p-city').value = city;
+    if (note) note.textContent = '';
+  } catch (_) {
+    if (note) note.textContent = 'ZIP not found \u2014 enter city manually.';
+  }
+}
+
+async function fetchCityFromZip(zip5){
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), 4000);
+  try {
+    const res = await fetch(`https://api.zippopotam.us/us/${zip5}`, {signal: controller.signal});
+    if (!res.ok) throw new Error('not found');
+    const data = await res.json();
+    if (!data.places || !data.places.length) throw new Error('no places');
+    return data.places[0]['place name'];
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function initZipCache(){
+  Object.assign(ZIP_CACHE, ZIP_CITY_MAP);
 }
 
 
@@ -1055,6 +1089,7 @@ onLoanTypeChange();
 onDpaToggle();
 setDefaultDates();
 loadDefaults();
+initZipCache();
 </script>
 </div>
 </body>
