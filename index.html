@@ -65,7 +65,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
   <div class="dml-grid3">
     <div><label class="dml-label">City</label><input type="text" id="p-city" autocomplete="off" autocapitalize="words" oninput="onCityInput()" onblur="titleCaseCity()"></div>
     <div><label class="dml-label">State</label><input type="text" id="p-state" value="MD" autocomplete="off"></div>
-    <div><label class="dml-label">Zip <span style="font-weight:400;font-size:11px;color:#9e9b95;">— auto-fills city</span></label><input type="text" id="p-zip" inputmode="numeric" autocomplete="off" oninput="onZipInput()"></div>
+    <div><label class="dml-label">Zip</label><input type="text" id="p-zip" inputmode="numeric" autocomplete="off" oninput="onZipInput()" placeholder="auto-fills city"></div>
   </div>
   <div class="dml-small" id="zip-city-note"></div>
   <div class="dml-small" style="margin-top:6px;">Look up assessed value: <a href="https://sdat.dat.maryland.gov/RealProperty/Pages/default.aspx" target="_blank" rel="noopener">MD SDAT Real Property Search</a></div>
@@ -933,26 +933,12 @@ function buildCopyText(){
 function copyText(){
   const txt = buildCopyText();
   if (!txt) return;
-  const flash = () => {
+  navigator.clipboard.writeText(txt).then(()=>{
     const btn = $('copy-btn');
     const orig = btn.textContent;
     btn.textContent = 'Copied!';
     setTimeout(()=>{ btn.textContent = orig; }, 1500);
-  };
-  const fallback = () => {
-    const ta = document.createElement('textarea');
-    ta.value = txt;
-    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
-    document.body.appendChild(ta);
-    ta.focus(); ta.select();
-    try{ document.execCommand('copy'); flash(); }catch(e){}
-    document.body.removeChild(ta);
-  };
-  if (navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(flash).catch(fallback);
-  } else {
-    fallback();
-  }
+  });
 }
 
 
@@ -1222,7 +1208,6 @@ function generateLetter(){
     box.appendChild(shareBtn);
   }
 
-  try{ dlLink.click(); }catch(e){}
 }
 
 
