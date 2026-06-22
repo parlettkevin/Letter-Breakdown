@@ -40,7 +40,7 @@
 details.dml-card summary{cursor:pointer;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#9a958a;}
 details.dml-card[open] summary{margin-bottom:10px;}
 .dml-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.dml-sticky-bar{position:sticky;bottom:0;background:#fff;padding:10px 0 6px;border-top:1px solid #e7e3da;z-index:10;margin-top:12px;}
+.dml-sticky-bar{position:sticky;bottom:0;background:#fff;padding:10px 0 max(env(safe-area-inset-bottom),6px);border-top:1px solid #e7e3da;z-index:10;margin-top:12px;}
 .dml-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 </style>
 
@@ -1112,35 +1112,36 @@ function generateLetter(){
 
   const fileName = 'Preapproval - ' + (name||'Borrower') + '.pdf';
   const blob = doc.output('blob');
-  const url = URL.createObjectURL(blob);
+  const file = new File([blob], fileName, {type:'application/pdf'});
 
   const box = $('pdf-output');
   box.innerHTML = '';
   box.style.display = '';
 
-  const dlLink = document.createElement('a');
-  dlLink.href = url;
-  dlLink.download = fileName;
-  dlLink.className = 'dml-btn';
-  dlLink.style.display = 'block';
-  dlLink.style.marginBottom = '10px';
-  dlLink.textContent = 'Save PDF';
-  box.appendChild(dlLink);
-
-  const frame = document.createElement('iframe');
-  frame.src = url;
-  frame.style.width = '100%';
-  frame.style.height = '480px';
-  frame.style.border = '1px solid #d8d3c6';
-  frame.style.borderRadius = '8px';
-  frame.style.marginTop = '10px';
-  box.appendChild(frame);
-
-  /* Use the download-attribute link rather than doc.save() to avoid iOS Safari
-     navigating the current tab away from the tool. The download attribute
-     triggers the native save/share flow and keeps the file as a clean PDF
-     rather than exposing a blob URL in the share sheet. */
-  try{ dlLink.click(); }catch(e){ /* user can still tap "Save PDF" manually */ }
+  /* On iOS 15+ (and Android Chrome), navigator.share with a File object hands
+     the PDF directly to the native share sheet as a document — no blob URL,
+     no link, just the file. Fallback for desktop / older browsers is a
+     standard download-attribute anchor. */
+  if (navigator.canShare && navigator.canShare({files:[file]})){
+    const shareBtn = document.createElement('button');
+    shareBtn.type = 'button';
+    shareBtn.className = 'dml-btn';
+    shareBtn.style.width = '100%';
+    shareBtn.textContent = 'Share / Save PDF';
+    shareBtn.onclick = () => navigator.share({files:[file], title:fileName}).catch(()=>{});
+    box.appendChild(shareBtn);
+    shareBtn.click();
+  } else {
+    const url = URL.createObjectURL(blob);
+    const dlLink = document.createElement('a');
+    dlLink.href = url;
+    dlLink.download = fileName;
+    dlLink.className = 'dml-btn';
+    dlLink.style.display = 'block';
+    dlLink.textContent = 'Save PDF';
+    box.appendChild(dlLink);
+    try{ dlLink.click(); }catch(e){}
+  }
 }
 
 
