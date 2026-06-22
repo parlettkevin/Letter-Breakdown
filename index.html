@@ -649,6 +649,24 @@ function initZipCache(){
   Object.assign(ZIP_CACHE, ZIP_CITY_MAP);
 }
 
+async function fetchCityFromZip(zip5){
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), 4000);
+  try {
+    const res = await fetch(`https://api.zippopotam.us/us/${zip5}`, {signal: controller.signal});
+    if (!res.ok) throw new Error('not found');
+    const data = await res.json();
+    if (!data.places || !data.places.length) throw new Error('no places');
+    return data.places[0]['place name'];
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function initZipCache(){
+  Object.assign(ZIP_CACHE, ZIP_CITY_MAP);
+}
+
 /* ---------- SDAT lookup ---------- */
 function onSdatFieldClick(){
   const el = $('sdat-acct-id');
