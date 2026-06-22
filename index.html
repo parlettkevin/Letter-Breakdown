@@ -1118,36 +1118,14 @@ function generateLetter(){
   box.innerHTML = '';
   box.style.display = '';
 
-  const linkRow = document.createElement('div');
-  linkRow.style.display = 'flex';
-  linkRow.style.gap = '10px';
-  linkRow.style.marginBottom = '10px';
-
-  const openLink = document.createElement('a');
-  openLink.href = url;
-  openLink.target = '_blank';
-  openLink.rel = 'noopener';
-  openLink.className = 'dml-btn';
-  openLink.style.flex = '1';
-  openLink.textContent = 'Open PDF';
-
   const dlLink = document.createElement('a');
   dlLink.href = url;
   dlLink.download = fileName;
-  dlLink.target = '_blank';
-  dlLink.rel = 'noopener';
-  dlLink.className = 'dml-btn dml-btn-secondary';
-  dlLink.style.flex = '1';
-  dlLink.textContent = 'Download';
-
-  linkRow.appendChild(openLink);
-  linkRow.appendChild(dlLink);
-  box.appendChild(linkRow);
-
-  const note = document.createElement('div');
-  note.className = 'dml-small';
-  note.textContent = "If Download doesn't do anything on your phone, tap Open PDF, then use your browser's share or save icon.";
-  box.appendChild(note);
+  dlLink.className = 'dml-btn';
+  dlLink.style.display = 'block';
+  dlLink.style.marginBottom = '10px';
+  dlLink.textContent = 'Save PDF';
+  box.appendChild(dlLink);
 
   const frame = document.createElement('iframe');
   frame.src = url;
@@ -1158,16 +1136,11 @@ function generateLetter(){
   frame.style.marginTop = '10px';
   box.appendChild(frame);
 
-  /* Deliberately NOT calling jsPDF's doc.save() here: on iOS Safari and some
-     mobile webviews, doc.save() falls back to navigating the CURRENT tab to
-     the PDF when it can't trigger a real download, which is exactly what was
-     wiping your fields when you hit the back button. Instead we click the
-     visible, already-in-the-page "Open PDF" link, which every mobile browser
-     we know of honors as a normal target="_blank" tap and opens a separate
-     tab/window for, leaving this tool tab untouched. If a popup blocker (or
-     iOS standalone/home-screen mode) still suppresses it, the button is right
-     there for a manual tap. */
-  try{ openLink.click(); }catch(e){ /* user can still tap "Open PDF" manually */ }
+  /* Use the download-attribute link rather than doc.save() to avoid iOS Safari
+     navigating the current tab away from the tool. The download attribute
+     triggers the native save/share flow and keeps the file as a clean PDF
+     rather than exposing a blob URL in the share sheet. */
+  try{ dlLink.click(); }catch(e){ /* user can still tap "Save PDF" manually */ }
 }
 
 
