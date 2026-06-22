@@ -239,12 +239,8 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <button type="button" class="dml-btn dml-btn-secondary" id="copy-plain-btn" onclick="copyText('plain')">Copy plain text</button>
   </div>
   <div style="height:10px;"></div>
-  <button type="button" class="dml-btn" onclick="generateLetter()">Download preapproval letter (PDF)</button>
-  <div id="pdf-output" style="display:none;margin-top:12px;"></div>
-
-  <div style="height:10px;"></div>
   <div class="dml-card">
-    <p class="dml-h">Summary export</p>
+    <p class="dml-h">Download options</p>
     <div class="dml-check">
       <input type="radio" name="summary-layout" id="layout-1" value="1" checked>
       <label for="layout-1">Address &amp; Loan Type Only</label>
@@ -253,8 +249,11 @@ details.dml-card[open] summary{margin-bottom:10px;}
       <input type="radio" name="summary-layout" id="layout-2" value="2">
       <label for="layout-2">Address, Loan Type &amp; Purchase Price</label>
     </div>
+    <div style="height:10px;"></div>
+    <button type="button" class="dml-btn" onclick="generateLetter()">Download preapproval letter (PDF)</button>
+    <div id="pdf-output" style="display:none;margin-top:12px;"></div>
     <div style="height:8px;"></div>
-    <button type="button" class="dml-btn dml-btn-secondary" onclick="downloadSummary()">&#x1F4E5; Download Summary</button>
+    <button type="button" class="dml-btn dml-btn-secondary" onclick="downloadSummary()">&#x1F4E5; Download Summary (.txt)</button>
   </div>
 </div>
 
@@ -1117,9 +1116,12 @@ function generateLetter(){
   doc.setFont(font,'normal');
   y += lineH;
 
-  doc.text('Sales Price:', marginX, y);
-  doc.text('$' + fmt(c.price), marginX+140, y);
-  y += lineH;
+  const layout = document.querySelector('input[name="summary-layout"]:checked').value;
+  if (layout === '2') {
+    doc.text('Sales Price:', marginX, y);
+    doc.text('$' + fmt(c.price), marginX+140, y);
+    y += lineH;
+  }
   doc.text('Loan Type:', marginX, y);
   doc.text(c.loanType, marginX+140, y);
   y += lineH*1.5;
