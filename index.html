@@ -65,6 +65,16 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <div><label class="dml-label">Zip</label><input type="text" id="p-zip" inputmode="numeric" autocomplete="off" oninput="onZipInput()"></div>
   </div>
   <div class="dml-small" id="zip-city-note"></div>
+  <div class="dml-row" style="margin-top:8px;align-items:flex-end;">
+    <div style="flex:1;min-width:0;">
+      <label class="dml-label">SDAT Account ID</label>
+      <input type="text" id="sdat-acct-id" autocomplete="off" onclick="onSdatFieldClick()" oninput="onSdatManualInput()">
+    </div>
+    <div style="flex-shrink:0;padding-bottom:1px;">
+      <button type="button" id="sdat-lookup-btn" class="dml-btn dml-btn-secondary" onclick="lookupSdat()" style="width:auto;padding:8px 11px;font-size:13px;white-space:nowrap;">&#128269; Look Up</button>
+    </div>
+  </div>
+  <div class="dml-small" id="sdat-note"></div>
 </div>
 
 <div class="dml-card">
@@ -435,7 +445,7 @@ function escrowReserve(annualAmount, disbursementMonths, closingMonth, cushionCa
 }
 
 /* ---------- manual override locks (so auto-fills never clobber a typed value) ---------- */
-const fieldLock = { closingCosts: false, taxAnnual: false, lenderTitle: false, ownerTitle: false, city: false };
+const fieldLock = { closingCosts: false, taxAnnual: false, lenderTitle: false, ownerTitle: false, city: false, sdatAcct: false };
 
 /* Old Republic Title MD rate schedule, effective 1/1/2025 (filed-rate state).
    Brackets are processed in order; ceiling of last bracket must be Infinity. */
@@ -639,7 +649,91 @@ function initZipCache(){
   Object.assign(ZIP_CACHE, ZIP_CITY_MAP);
 }
 
+/* ---------- SDAT lookup ---------- */
+function onSdatFieldClick(){
+  const el = $('sdat-acct-id');
+  if (el.readOnly){
+    el.readOnly = false;
+    fieldLock.sdatAcct = false;
+    $('sdat-note').textContent = 'Unlocked — enter a custom SDAT ID, or click Look Up to re-fetch.';
+  }
+}
+function onSdatManualInput(){
+  fieldLock.sdatAcct = $('sdat-acct-id').value.trim() !== '';
+}
 
+async function lookupSdat(){
+  const street = $('p-street').value.trim();
+  const city   = $('p-city').value.trim();
+  const state  = ($('p-state').value.trim() || 'MD');
+  const zip    = $('p-zip').value.replace(/\D/g,'').slice(0,5);
+  const note   = $('sdat-note');
+  const btn    = $('sdat-lookup-btn');
+
+  if (!street || zip.length < 5){
+    note.textContent = 'Enter a street address and ZIP first.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Looking up…';
+  note.textContent = '';
+
+  try {
+    const result = await fetchSdatData(street, city, state, zip);
+    if (!result){
+      note.textContent = 'No parcel found — enter SDAT ID manually.';
+      $('sdat-acct-id').readOnly = false;
+      btn.textContent = '\u{1F50D} Look Up';
+      btn.disabled = false;
+      return;
+    }
+    $('sdat-acct-id').value   = result.acctId;
+    $('sdat-acct-id').readOnly = true;
+    fieldLock.sdatAcct = true;
+    note.innerHTML = result.sdatUrl
+      ? 'Matched · <a href="' + result.sdatUrl + '" target="_blank" rel="noopener" style="color:#f4791f;text-decoration:none;font-weight:600;">Open in SDAT ↗</a> · Click field to override.'
+      : 'Matched. Click field to override.';
+    btn.textContent = '✓ Found';
+    setTimeout(()=>{ btn.textContent = '\u{1F50D} Look Up'; btn.disabled = false; }, 2000);
+  } catch(e){
+    note.textContent = 'Lookup failed — check connection or enter SDAT ID manually.';
+    btn.textContent = '\u{1F50D} Look Up';
+    btn.disabled = false;
+  }
+}
+
+async function fetchSdatData(street, city, state, zip){
+  /* Hop 1: Census geocoder → lat/lng (CORS-safe, no key required) */
+  const addr = encodeURIComponent([street, city, state, zip].filter(Boolean).join(', '));
+  const geoRes = await fetch(
+    'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress' +
+    '?address=' + addr + '&benchmark=Public_AR_Current&format=json',
+    { signal: AbortSignal.timeout(6000) }
+  );
+  if (!geoRes.ok) throw new Error('geocoder error');
+  const geoData = await geoRes.json();
+  const matches = geoData.result && geoData.result.addressMatches;
+  if (!matches || !matches.length) return null;
+
+  const { x: lon, y: lat } = matches[0].coordinates;
+
+  /* Hop 2: MD iMAP parcel spatial query — inSR=4326 is required */
+  const parcelRes = await fetch(
+    'https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_ParcelBoundaries/MapServer/0/query' +
+    '?geometry=' + lon + '%2C' + lat +
+    '&geometryType=esriGeometryPoint&inSR=4326' +
+    '&spatialRel=esriSpatialRelIntersects' +
+    '&outFields=ACCTID%2CSDATWEBADR&returnGeometry=false&f=json',
+    { signal: AbortSignal.timeout(8000) }
+  );
+  if (!parcelRes.ok) throw new Error('parcel query error');
+  const parcelData = await parcelRes.json();
+  if (!parcelData.features || !parcelData.features.length) return null;
+
+  const a = parcelData.features[0].attributes;
+  return { acctId: (a.ACCTID || '').trim(), sdatUrl: (a.SDATWEBADR || '').trim() };
+}
 
 /* ---------- main calculation ---------- */
 function calculate(){
