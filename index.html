@@ -186,6 +186,14 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <div><label class="dml-label">Assets verified</label><input type="date" id="assets-date" autocomplete="off"></div>
     <div><label class="dml-label">Credit verified</label><input type="date" id="credit-date" autocomplete="off"></div>
   </div>
+  <div class="dml-row" style="margin-top:10px;margin-bottom:0;">
+    <div><label class="dml-label">Signing loan officer</label>
+      <select id="signer" autocomplete="off">
+        <option value="kevin">Kevin Parlett</option>
+        <option value="corey">Corey Glowacki</option>
+      </select>
+    </div>
+  </div>
 </div>
 
 <div id="status-msg" style="display:none;background:#fff4e8;border:1px solid #f4c98a;color:#7a4a10;font-size:13.5px;padding:10px 12px;border-radius:8px;margin-bottom:12px;"></div>
@@ -1122,15 +1130,21 @@ function generateLetter(){
 
   para('Any new accounts you open, credit charges incurred, or credit inquiries entered on your credit report subsequent to the date of this letter may impact your credit scores, your maximum qualifying price range, and the interest rate.');
 
-  para("Thank you for selecting Direct Mortgage Loans. We appreciate your business and your trust in us to help you with your mortgage needs. Please don't hesitate to call me at 410-459-9299 or email me at kparlett@directmortgageloans.com with any questions.", {gap:lineH});
+  const SIGNERS = {
+    kevin: {name:'Kevin Parlett', title:'Loan Originator',       nmls:'1821922', phone:'410-459-9299',  email:'kparlett@directmortgageloans.com'},
+    corey: {name:'Corey Glowacki',title:'Senior Mortgage Banker',nmls:'1607629', phone:'410-891-3975',  email:'cglowacki@directmortgageloans.com'}
+  };
+  const signer = SIGNERS[$('signer').value] || SIGNERS.kevin;
+
+  para("Thank you for selecting Direct Mortgage Loans. We appreciate your business and your trust in us to help you with your mortgage needs. Please don't hesitate to call me at " + signer.phone + ' or email me at ' + signer.email + ' with any questions.', {gap:lineH});
 
   doc.text('Sincerely,', marginX, y);
   y += lineH*2.2;
-  doc.text('Kevin Parlett', marginX, y); y += lineH;
-  doc.text('Loan Originator', marginX, y); y += lineH;
-  doc.text('NMLS ID 1821922', marginX, y); y += lineH;
-  doc.text('Phone: 410-459-9299', marginX, y); y += lineH;
-  doc.text('Email: kparlett@directmortgageloans.com', marginX, y);
+  doc.text(signer.name,              marginX, y); y += lineH;
+  doc.text(signer.title,             marginX, y); y += lineH;
+  doc.text('NMLS ID ' + signer.nmls, marginX, y); y += lineH;
+  doc.text('Phone: ' + signer.phone, marginX, y); y += lineH;
+  doc.text('Email: ' + signer.email, marginX, y);
 
   const fileName = 'Preapproval - ' + (name||'Borrower') + '.pdf';
   const blob = doc.output('blob');
