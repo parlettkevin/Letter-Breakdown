@@ -40,6 +40,7 @@
 details.dml-card summary{cursor:pointer;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#9a958a;}
 details.dml-card[open] summary{margin-bottom:10px;}
 .dml-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.dml-sticky-bar{position:sticky;bottom:0;background:#fff;padding:10px 0 6px;border-top:1px solid #e7e3da;z-index:10;margin-top:12px;}
 .dml-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 </style>
 
@@ -120,7 +121,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <button type="button" class="dml-btn dml-btn-secondary" onclick="estimateTax()">Estimate tax</button>
   </details>
   <div class="dml-row" style="margin-top:12px;">
-    <div><label class="dml-label">Hazard insurance $/mo</label><input type="number" id="hazard-monthly" autocomplete="off"></div>
+    <div><label class="dml-label">Hazard insurance $/mo</label><input type="number" id="hazard-monthly" value="125" autocomplete="off"></div>
     <div><label class="dml-label">HOA $/mo</label><input type="number" id="hoa-monthly" value="0" autocomplete="off"></div>
   </div>
 </div>
@@ -132,7 +133,11 @@ details.dml-card[open] summary{margin-bottom:10px;}
   </div>
   <div class="dml-small" id="closing-costs-note"></div>
   <div class="dml-small" id="fee-breakdown"></div>
-  <div class="dml-small">Placeholder is the typical flat lender/vendor fee total (origination, underwriting, appraisal, credit report, settlement, etc.). Origination scales with the loan amount; the other lender/vendor fees below are flat dollar fees in practice. Title insurance and transfer tax, the pieces that also scale with price, are their own fields below.</div>
+  <div class="dml-row" style="margin-top:8px;">
+    <div><label class="dml-label">Discount Points (%)</label><input type="number" step="0.125" id="discount-points-pct" value="0" autocomplete="off"></div>
+    <div><label class="dml-label">Origination Credit (%)</label><input type="number" step="0.125" id="origination-credit-pct" value="0" autocomplete="off"></div>
+  </div>
+  <div class="dml-small">Origination fee is the typical flat lender/vendor fee total (origination, underwriting, appraisal, credit report, settlement, etc.). Origination scales with the loan amount; the other lender/vendor fees below are flat dollar fees in practice. Title insurance and transfer tax, the pieces that also scale with price, are their own fields below.</div>
   <div class="dml-row">
     <div><label class="dml-label">Lender's title insurance</label><input type="number" id="lender-title" autocomplete="off" oninput="onLenderTitleInput()"></div>
     <div><label class="dml-label">Owner's title insurance</label><input type="number" id="owner-title" autocomplete="off" oninput="onOwnerTitleInput()"></div>
@@ -181,7 +186,11 @@ details.dml-card[open] summary{margin-bottom:10px;}
 
 <div id="status-msg" style="display:none;background:#fff4e8;border:1px solid #f4c98a;color:#7a4a10;font-size:13.5px;padding:10px 12px;border-radius:8px;margin-bottom:12px;"></div>
 
+<div class="dml-sticky-bar">
 <button type="button" class="dml-btn" onclick="calculate()">Calculate</button>
+</div>
+
+<div id="calc-warnings" style="display:none;background:#fff4e8;border:1px solid #f4c98a;color:#7a4a10;font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:12px;line-height:1.5;"></div>
 
 <div id="results" style="display:none;margin-top:14px;">
   <div class="dml-card">
@@ -209,6 +218,8 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <div class="dml-result-row"><span class="dml-result-label">Transfer taxes</span><span id="r-transfer"></span></div>
     <div class="dml-result-row"><span class="dml-result-label">Prepaids/reserves</span><span id="r-reserves"></span></div>
     <div class="dml-small" id="r-escrow-detail" style="margin-bottom:8px;"></div>
+    <div class="dml-result-row" id="r-points-row" style="display:none;"><span class="dml-result-label">Discount Points</span><span id="r-points"></span></div>
+    <div class="dml-result-row" id="r-orig-credit-row" style="display:none;"><span class="dml-result-label">Origination Credit</span><span id="r-orig-credit"></span></div>
     <div class="dml-result-row" id="r-dpa-row"><span class="dml-result-label">DPA credit</span><span id="r-dpa"></span></div>
     <div class="dml-result-row" id="r-seller-row"><span class="dml-result-label">Seller credit</span><span id="r-seller"></span></div>
     <div class="dml-result-row total"><span>Total</span><span id="r-cash"></span></div>
@@ -295,14 +306,21 @@ const ZIP_CITY_MAP = {
   "21228":"Catonsville", "21234":"Parkville", "21236":"Nottingham", "21237":"Rosedale"
 };
 
-/* Flat lender/vendor closing fees -- these are flat dollar fees in practice,
-   not price-based. Title insurance and transfer/recordation tax are handled
-   as their own separate fields since those genuinely scale with price/loan amount. */
+/* Flat lender/vendor closing fees — penny-accurate from DML worksheets (1005 Wakely Cir, 2025).
+   Title insurance and transfer/recordation tax are separate fields since they scale with price/loan. */
 const FLAT_LENDER_FEES = {
-  processingFee: 760, underwritingFee: 1295, closingTechFee: 150,
-  appraisalFee: 600, creditReportFee: 325, floodCertFee: 13, verificationsFee: 140,
-  closingProtectionLetter: 50, titleBinderFee: 150, settlementFee: 450,
-  recordingFee: 50, titleExaminationFee: 320
+  underwritingFee:          1395.00,
+  closingTechFee:            150.00,
+  appraisalFee:              605.00,
+  creditReportFee:           321.64,
+  floodCertFee:               13.00,
+  verificationsFee:          140.00,
+  titleExaminationFee:       695.00,
+  titleAbstractFee:          260.00,
+  adminFee:                  100.00,
+  titleBinderFee:             95.00,
+  closingProtectionLetter:    55.00,
+  recordingFee:               65.00,
 };
 function flatLenderFeesTotal(){
   return Object.values(FLAT_LENDER_FEES).reduce((a,b)=>a+b,0);
@@ -419,14 +437,25 @@ function escrowReserve(annualAmount, disbursementMonths, closingMonth, cushionCa
 /* ---------- manual override locks (so auto-fills never clobber a typed value) ---------- */
 const fieldLock = { closingCosts: false, taxAnnual: false, lenderTitle: false, ownerTitle: false, city: false };
 
-/* Old Republic Title MD rate schedule, effective 1/1/2025 (Maryland is a filed-rate state,
-   so other underwriters' actual quotes may differ -- this is a real, sourced schedule, not a guess,
-   but the specific company Kevin quotes through may not match exactly). */
-const LENDER_TITLE_SIMULTANEOUS = 275.00; // flat, basic policy, issued simultaneously with owner's policy
+/* Old Republic Title MD rate schedule, effective 1/1/2025 (filed-rate state).
+   Brackets are processed in order; ceiling of last bracket must be Infinity. */
+const LENDER_TITLE_SIMULTANEOUS = 275.00;
+const OWNER_TITLE_BRACKETS = [
+  { ceiling: 250_000,  ratePerK: 5.40 },
+  { ceiling: Infinity, ratePerK: 4.60 },
+];
+const OWNER_TITLE_MIN = 300;
 function ownerTitleEstimate(price){
   if (!price) return 0;
-  if (price <= 250000) return Math.max(300, price/1000*5.40);
-  return 1350 + (price-250000)/1000*4.60;
+  let premium = 0, remaining = price, prevCeiling = 0;
+  for (const b of OWNER_TITLE_BRACKETS){
+    const slice = Math.min(remaining, b.ceiling - prevCeiling);
+    premium += (slice / 1000) * b.ratePerK;
+    remaining -= slice;
+    prevCeiling = b.ceiling;
+    if (remaining <= 0) break;
+  }
+  return Math.max(OWNER_TITLE_MIN, premium);
 }
 
 function effectiveCountyRates(county){
@@ -484,11 +513,12 @@ function renderFeeBreakdown(){
   if (!loanAmount){ el.textContent = ''; return; }
   const origination = originationFee(loanAmount);
   const flatTotal = flatLenderFeesTotal();
+  const named = FLAT_LENDER_FEES.underwritingFee + FLAT_LENDER_FEES.appraisalFee + FLAT_LENDER_FEES.creditReportFee;
   el.innerHTML =
     'Origination (' + ORIGINATION_FEE_PCT + '% of ' + money(loanAmount) + ' loan): <strong>' + money(origination) + '</strong><br>' +
-    'Underwriting ' + money(FLAT_LENDER_FEES.underwritingFee) + ' &middot; Credit report ' + money(FLAT_LENDER_FEES.creditReportFee) +
-    ' &middot; Processing ' + money(FLAT_LENDER_FEES.processingFee) + ' &middot; other flat fees ' +
-    money(flatTotal - FLAT_LENDER_FEES.underwritingFee - FLAT_LENDER_FEES.creditReportFee - FLAT_LENDER_FEES.processingFee) + '<br>' +
+    'Underwriting ' + money(FLAT_LENDER_FEES.underwritingFee) + ' &middot; Appraisal ' + money(FLAT_LENDER_FEES.appraisalFee) +
+    ' &middot; Credit report ' + money(FLAT_LENDER_FEES.creditReportFee) + ' &middot; other flat fees ' +
+    money(flatTotal - named) + '<br>' +
     'Dynamic total: <strong>' + money(origination + flatTotal) + '</strong>';
 }
 function autoFillClosingCosts(){
@@ -701,6 +731,10 @@ function calculate(){
   const lenderTitle = num('lender-title');
   const ownerTitle = num('owner-title');
   const sellerCredit = num('seller-credit');
+  const discountPointsPct = num('discount-points-pct');
+  const originationCreditPct = num('origination-credit-pct');
+  const discountPointsAmount = baseLoan * (discountPointsPct / 100);
+  const originationCreditAmount = baseLoan * (originationCreditPct / 100);
 
   /* ---------- MD escrow & prepaid logic, driven by closing month/day ---------- */
   const closingMonth = parseInt($('closing-month').value, 10);
@@ -717,19 +751,53 @@ function calculate(){
   const reservesTotal = dailyInt + hoiPrepaid + hazardEscrow + taxEscrow;
 
   const cashToClose = downPayment + closingCosts + lenderTitle + ownerTitle + transferTotal + reservesTotal +
-                       (ufmipFull-ufmipFinanced) - dpa - sellerCredit;
+                       (ufmipFull-ufmipFinanced) - dpa - sellerCredit + discountPointsAmount - originationCreditAmount;
 
   window.__lastCalc = {
     price, loanType, downPct, downPayment, baseLoan, rate, termYears,
     ufmipFull, ufmipFinanced, totalLoan, dpa, financeUpfront,
     pi, hazardMonthly, taxMonthly, miMonthly, hoaMonthly, totalMonthly,
     stateTransfer, countyTransfer, recordation, transferTotal,
-    closingCosts, lenderTitle, ownerTitle, sellerCredit, cashToClose,
+    closingCosts, lenderTitle, ownerTitle, sellerCredit,
+    discountPointsAmount, originationCreditAmount, cashToClose,
     closingMonth, closingDay, prepaidDays: days, dailyInt, hoiPrepaid, hazardEscrow, taxEscrow, reservesTotal
   };
 
   renderResults();
+  checkWarnings(window.__lastCalc);
   saveDefaults();
+}
+
+/* ---------- warnings ---------- */
+function checkWarnings(c){
+  const warns = [];
+  const ltv = c.baseLoan / c.price;
+  if (c.loanType === 'Conventional' && ltv > 0.97)
+    warns.push('LTV is ' + (ltv*100).toFixed(1) + '% on Conventional — most programs cap at 97%. Check down payment.');
+  if (c.loanType === 'FHA' && ltv > 0.965)
+    warns.push('FHA base LTV exceeds 96.5% — minimum down payment is 3.5% of purchase price.');
+  if (c.loanType === 'VA' && ltv > 1.00)
+    warns.push('VA loan LTV above 100% — verify funding fee financing is correct.');
+  if (c.rate * 100 > 9)
+    warns.push('Rate is ' + (c.rate*100).toFixed(3) + '% — above 9%, confirm this is intentional.');
+  if (c.rate * 100 < 2)
+    warns.push('Rate is ' + (c.rate*100).toFixed(3) + '% — below 2%, confirm this is correct.');
+  if (c.cashToClose < 0)
+    warns.push('Cash to close is negative (' + money(c.cashToClose) + ') — credits exceed total charges. Verify seller credit and DPA entries.');
+  const ccPct = c.totalLoan > 0 ? (c.closingCosts / c.totalLoan) * 100 : 0;
+  if (ccPct > 6)
+    warns.push('Closing costs are ' + ccPct.toFixed(1) + '% of the loan — unusually high. Check fee entries.');
+  renderWarnings(warns);
+}
+function renderWarnings(warns){
+  const el = $('calc-warnings');
+  if (!el) return;
+  if (!warns.length){ el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = '';
+  el.innerHTML = warns.map(w =>
+    '<div style="display:flex;gap:6px;align-items:baseline;margin-bottom:4px;">' +
+    '<span style="font-weight:700;">&#9888;</span><span>' + w + '</span></div>'
+  ).join('');
 }
 
 /* ---------- render ---------- */
@@ -759,6 +827,10 @@ function renderResults(){
   $('r-owner-title').textContent = money(c.ownerTitle);
   $('r-transfer').textContent = money(c.transferTotal);
   $('r-reserves').textContent = money(c.reservesTotal);
+  $('r-points-row').style.display = c.discountPointsAmount ? '' : 'none';
+  $('r-points').textContent = money(c.discountPointsAmount);
+  $('r-orig-credit-row').style.display = c.originationCreditAmount ? '' : 'none';
+  $('r-orig-credit').textContent = '-' + money(c.originationCreditAmount);
   $('r-dpa-row').style.display = c.dpa ? '' : 'none';
   $('r-dpa').textContent = '-' + money(c.dpa);
   $('r-seller-row').style.display = c.sellerCredit ? '' : 'none';
