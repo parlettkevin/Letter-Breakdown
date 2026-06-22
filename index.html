@@ -1154,30 +1154,31 @@ function generateLetter(){
   box.innerHTML = '';
   box.style.display = '';
 
-  /* On iOS 15+ (and Android Chrome), navigator.share with a File object hands
-     the PDF directly to the native share sheet as a document — no blob URL,
-     no link, just the file. Fallback for desktop / older browsers is a
-     standard download-attribute anchor. */
+  /* Always provide a direct download anchor — works reliably on desktop and
+     modern iOS. Also show a Share button when the Web Share API supports files
+     (iOS share sheet, Android). Both options together means no platform is left
+     without a working path. */
+  const url = URL.createObjectURL(blob);
+
+  const dlLink = document.createElement('a');
+  dlLink.href = url;
+  dlLink.download = fileName;
+  dlLink.className = 'dml-btn';
+  dlLink.style.display = 'block';
+  dlLink.textContent = 'Download PDF';
+  box.appendChild(dlLink);
+
   if (navigator.canShare && navigator.canShare({files:[file]})){
     const shareBtn = document.createElement('button');
     shareBtn.type = 'button';
-    shareBtn.className = 'dml-btn';
-    shareBtn.style.width = '100%';
+    shareBtn.className = 'dml-btn dml-btn-secondary';
+    shareBtn.style.cssText = 'width:100%;display:block;margin-top:8px;';
     shareBtn.textContent = 'Share / Save PDF';
     shareBtn.onclick = () => navigator.share({files:[file], title:fileName}).catch(()=>{});
     box.appendChild(shareBtn);
-    shareBtn.click();
-  } else {
-    const url = URL.createObjectURL(blob);
-    const dlLink = document.createElement('a');
-    dlLink.href = url;
-    dlLink.download = fileName;
-    dlLink.className = 'dml-btn';
-    dlLink.style.display = 'block';
-    dlLink.textContent = 'Save PDF';
-    box.appendChild(dlLink);
-    try{ dlLink.click(); }catch(e){}
   }
+
+  try{ dlLink.click(); }catch(e){}
 }
 
 
