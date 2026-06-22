@@ -933,12 +933,25 @@ function buildCopyText(){
 function copyText(){
   const txt = buildCopyText();
   if (!txt) return;
-  navigator.clipboard.writeText(txt).then(()=>{
+  const flash = () => {
     const btn = $('copy-btn');
     const orig = btn.textContent;
     btn.textContent = 'Copied!';
     setTimeout(()=>{ btn.textContent = orig; }, 1500);
-  });
+  };
+  /* execCommand must run synchronously inside the user-gesture (this click).
+     navigator.clipboard.writeText URL-encodes plain text on iOS 13/14 Safari. */
+  const ta = document.createElement('textarea');
+  ta.value = txt;
+  ta.setAttribute('readonly', '');
+  ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.setSelectionRange(0, 99999);
+  let ok = false;
+  try{ ok = document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+  if (ok){ flash(); } else if (navigator.clipboard){ navigator.clipboard.writeText(txt).then(flash); }
 }
 
 
