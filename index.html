@@ -65,16 +65,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <div><label class="dml-label">Zip</label><input type="text" id="p-zip" inputmode="numeric" autocomplete="off" oninput="onZipInput()"></div>
   </div>
   <div class="dml-small" id="zip-city-note"></div>
-  <div class="dml-row" style="margin-top:8px;align-items:flex-end;">
-    <div style="flex:1;min-width:0;">
-      <label class="dml-label">SDAT Account ID</label>
-      <input type="text" id="sdat-acct-id" autocomplete="off" onclick="onSdatFieldClick()" oninput="onSdatManualInput()">
-    </div>
-    <div style="flex-shrink:0;padding-bottom:1px;">
-      <button type="button" id="sdat-lookup-btn" class="dml-btn dml-btn-secondary" onclick="lookupSdat()" style="width:auto;padding:8px 11px;font-size:13px;white-space:nowrap;">&#128269; Look Up</button>
-    </div>
-  </div>
-  <div class="dml-small" id="sdat-note"></div>
+  <div class="dml-small" style="margin-top:6px;">Look up assessed value: <a href="https://sdat.dat.maryland.gov/RealProperty/Pages/default.aspx" target="_blank" rel="noopener">MD SDAT Real Property Search</a></div>
 </div>
 
 <div class="dml-card">
@@ -139,7 +130,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
 <div class="dml-card">
   <p class="dml-h">Closing costs</p>
   <div class="dml-row">
-    <div><label class="dml-label">Lender fees, title &amp; settlement (excl. transfer)</label><input type="number" id="closing-costs" autocomplete="off" oninput="onClosingCostsInput()"></div>
+    <div><label class="dml-label">Lender &amp; appraisal fees (excl. title &amp; transfer)</label><input type="number" id="closing-costs" autocomplete="off" oninput="onClosingCostsInput()"></div>
   </div>
   <div class="dml-small" id="closing-costs-note"></div>
   <div class="dml-small" id="fee-breakdown"></div>
@@ -147,7 +138,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <div><label class="dml-label">Discount Points (%)</label><input type="number" step="0.125" id="discount-points-pct" value="0" autocomplete="off"></div>
     <div><label class="dml-label">Origination Credit (%)</label><input type="number" step="0.125" id="origination-credit-pct" value="0" autocomplete="off"></div>
   </div>
-  <div class="dml-small">Origination fee is the typical flat lender/vendor fee total (origination, underwriting, appraisal, credit report, settlement, etc.). Origination scales with the loan amount; the other lender/vendor fees below are flat dollar fees in practice. Title insurance and transfer tax, the pieces that also scale with price, are their own fields below.</div>
+  <div class="dml-small">Lender overhead only: origination (0.5% of loan), underwriting, appraisal, credit report, and flat government/service fees. Title insurance premiums and settlement company fees are grouped under Title &amp; Settlement in the results.</div>
   <div class="dml-row">
     <div><label class="dml-label">Lender's title insurance</label><input type="number" id="lender-title" autocomplete="off" oninput="onLenderTitleInput()"></div>
     <div><label class="dml-label">Owner's title insurance</label><input type="number" id="owner-title" autocomplete="off" oninput="onOwnerTitleInput()"></div>
@@ -177,7 +168,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
 <details class="dml-card">
   <summary>Escrow cushion cap (advanced)</summary>
   <div class="dml-row" style="margin-top:10px;">
-    <div><label class="dml-label">Max cushion, months (RESPA cap is 2)</label><input type="number" id="cushion-cap-months" autocomplete="off"></div>
+    <div><label class="dml-label">Max cushion, months (RESPA cap is 2)</label><input type="number" id="cushion-cap-months" value="2" autocomplete="off"></div>
   </div>
 </details>
 
@@ -223,9 +214,16 @@ details.dml-card[open] summary{margin-bottom:10px;}
   <div class="dml-card">
     <p class="dml-h">Cash to close</p>
     <div class="dml-result-row"><span class="dml-result-label">Closing costs</span><span id="r-closing"></span></div>
-    <div class="dml-result-row"><span class="dml-result-label">Lender's title insurance</span><span id="r-lender-title"></span></div>
-    <div class="dml-result-row"><span class="dml-result-label">Owner's title insurance</span><span id="r-owner-title"></span></div>
-    <div class="dml-result-row"><span class="dml-result-label">Transfer taxes</span><span id="r-transfer"></span></div>
+    <div class="dml-result-row" style="margin-top:6px;"><span class="dml-result-label" style="font-weight:700;color:#3a3730;">Title &amp; Settlement</span><span id="r-title-settlement-total" style="font-weight:700;"></span></div>
+    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Lender's title</span><span id="r-lender-title"></span></div>
+    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Owner's title</span><span id="r-owner-title"></span></div>
+    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Title examination</span><span id="r-title-exam"></span></div>
+    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Title abstract</span><span id="r-title-abstract"></span></div>
+    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Admin</span><span id="r-admin-fee"></span></div>
+    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Title binder</span><span id="r-title-binder"></span></div>
+    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Closing protection letter</span><span id="r-cpl"></span></div>
+    <div class="dml-result-row" style="margin-top:6px;"><span class="dml-result-label">Transfer taxes</span><span id="r-transfer"></span></div>
+    <div class="dml-small" style="margin-bottom:6px;">Includes Maryland state/county transfer taxes and recordation stamps per local jurisdiction rules.</div>
     <div class="dml-result-row"><span class="dml-result-label">Prepaids/reserves</span><span id="r-reserves"></span></div>
     <div class="dml-small" id="r-escrow-detail" style="margin-bottom:8px;"></div>
     <div class="dml-result-row" id="r-points-row" style="display:none;"><span class="dml-result-label">Discount Points</span><span id="r-points"></span></div>
@@ -316,8 +314,8 @@ const ZIP_CITY_MAP = {
   "21228":"Catonsville", "21234":"Parkville", "21236":"Nottingham", "21237":"Rosedale"
 };
 
-/* Flat lender/vendor closing fees — penny-accurate from DML worksheets (1005 Wakely Cir, 2025).
-   Title insurance and transfer/recordation tax are separate fields since they scale with price/loan. */
+/* Core lender/appraisal fees — shown in the Closing Costs field.
+   Settlement/title company fees are broken out separately in TITLE_SETTLEMENT_FEES. */
 const FLAT_LENDER_FEES = {
   underwritingFee:          1395.00,
   closingTechFee:            150.00,
@@ -325,15 +323,22 @@ const FLAT_LENDER_FEES = {
   creditReportFee:           321.64,
   floodCertFee:               13.00,
   verificationsFee:          140.00,
+  recordingFee:               65.00,
+};
+function flatLenderFeesTotal(){
+  return Object.values(FLAT_LENDER_FEES).reduce((a,b)=>a+b,0);
+}
+
+/* Title company / settlement fees — bundled into the Title & Settlement results section. */
+const TITLE_SETTLEMENT_FEES = {
   titleExaminationFee:       695.00,
   titleAbstractFee:          260.00,
   adminFee:                  100.00,
   titleBinderFee:             95.00,
   closingProtectionLetter:    55.00,
-  recordingFee:               65.00,
 };
-function flatLenderFeesTotal(){
-  return Object.values(FLAT_LENDER_FEES).reduce((a,b)=>a+b,0);
+function titleSettlementFeesTotal(){
+  return Object.values(TITLE_SETTLEMENT_FEES).reduce((a,b)=>a+b,0);
 }
 
 /* Origination fee: calculated automatically, 0.5% of the base loan amount
@@ -445,7 +450,7 @@ function escrowReserve(annualAmount, disbursementMonths, closingMonth, cushionCa
 }
 
 /* ---------- manual override locks (so auto-fills never clobber a typed value) ---------- */
-const fieldLock = { closingCosts: false, taxAnnual: false, lenderTitle: false, ownerTitle: false, city: false, sdatAcct: false };
+const fieldLock = { closingCosts: false, taxAnnual: false, lenderTitle: false, ownerTitle: false, city: false };
 
 /* Old Republic Title MD rate schedule, effective 1/1/2025 (filed-rate state).
    Brackets are processed in order; ceiling of last bracket must be Infinity. */
@@ -527,9 +532,10 @@ function renderFeeBreakdown(){
   el.innerHTML =
     'Origination (' + ORIGINATION_FEE_PCT + '% of ' + money(loanAmount) + ' loan): <strong>' + money(origination) + '</strong><br>' +
     'Underwriting ' + money(FLAT_LENDER_FEES.underwritingFee) + ' &middot; Appraisal ' + money(FLAT_LENDER_FEES.appraisalFee) +
-    ' &middot; Credit report ' + money(FLAT_LENDER_FEES.creditReportFee) + ' &middot; other flat fees ' +
+    ' &middot; Credit report ' + money(FLAT_LENDER_FEES.creditReportFee) + ' &middot; other lender fees ' +
     money(flatTotal - named) + '<br>' +
-    'Dynamic total: <strong>' + money(origination + flatTotal) + '</strong>';
+    'Lender fee total: <strong>' + money(origination + flatTotal) + '</strong>' +
+    ' &nbsp;|&nbsp; Title &amp; settlement fees grouped separately below.';
 }
 function autoFillClosingCosts(){
   renderFeeBreakdown();
@@ -649,109 +655,6 @@ function initZipCache(){
   Object.assign(ZIP_CACHE, ZIP_CITY_MAP);
 }
 
-async function fetchCityFromZip(zip5){
-  const controller = new AbortController();
-  const timer = setTimeout(()=>controller.abort(), 4000);
-  try {
-    const res = await fetch(`https://api.zippopotam.us/us/${zip5}`, {signal: controller.signal});
-    if (!res.ok) throw new Error('not found');
-    const data = await res.json();
-    if (!data.places || !data.places.length) throw new Error('no places');
-    return data.places[0]['place name'];
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-function initZipCache(){
-  Object.assign(ZIP_CACHE, ZIP_CITY_MAP);
-}
-
-/* ---------- SDAT lookup ---------- */
-function onSdatFieldClick(){
-  const el = $('sdat-acct-id');
-  if (el.readOnly){
-    el.readOnly = false;
-    fieldLock.sdatAcct = false;
-    $('sdat-note').textContent = 'Unlocked — enter a custom SDAT ID, or click Look Up to re-fetch.';
-  }
-}
-function onSdatManualInput(){
-  fieldLock.sdatAcct = $('sdat-acct-id').value.trim() !== '';
-}
-
-async function lookupSdat(){
-  const street = $('p-street').value.trim();
-  const city   = $('p-city').value.trim();
-  const state  = ($('p-state').value.trim() || 'MD');
-  const zip    = $('p-zip').value.replace(/\D/g,'').slice(0,5);
-  const note   = $('sdat-note');
-  const btn    = $('sdat-lookup-btn');
-
-  if (!street || zip.length < 5){
-    note.textContent = 'Enter a street address and ZIP first.';
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Looking up…';
-  note.textContent = '';
-
-  try {
-    const result = await fetchSdatData(street, city, state, zip);
-    if (!result){
-      note.textContent = 'No parcel found — enter SDAT ID manually.';
-      $('sdat-acct-id').readOnly = false;
-      btn.textContent = '\u{1F50D} Look Up';
-      btn.disabled = false;
-      return;
-    }
-    $('sdat-acct-id').value   = result.acctId;
-    $('sdat-acct-id').readOnly = true;
-    fieldLock.sdatAcct = true;
-    note.innerHTML = result.sdatUrl
-      ? 'Matched · <a href="' + result.sdatUrl + '" target="_blank" rel="noopener" style="color:#f4791f;text-decoration:none;font-weight:600;">Open in SDAT ↗</a> · Click field to override.'
-      : 'Matched. Click field to override.';
-    btn.textContent = '✓ Found';
-    setTimeout(()=>{ btn.textContent = '\u{1F50D} Look Up'; btn.disabled = false; }, 2000);
-  } catch(e){
-    note.textContent = 'Lookup failed — check connection or enter SDAT ID manually.';
-    btn.textContent = '\u{1F50D} Look Up';
-    btn.disabled = false;
-  }
-}
-
-async function fetchSdatData(street, city, state, zip){
-  /* Hop 1: Census geocoder → lat/lng (CORS-safe, no key required) */
-  const addr = encodeURIComponent([street, city, state, zip].filter(Boolean).join(', '));
-  const geoRes = await fetch(
-    'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress' +
-    '?address=' + addr + '&benchmark=Public_AR_Current&format=json',
-    { signal: AbortSignal.timeout(6000) }
-  );
-  if (!geoRes.ok) throw new Error('geocoder error');
-  const geoData = await geoRes.json();
-  const matches = geoData.result && geoData.result.addressMatches;
-  if (!matches || !matches.length) return null;
-
-  const { x: lon, y: lat } = matches[0].coordinates;
-
-  /* Hop 2: MD iMAP parcel spatial query — inSR=4326 is required */
-  const parcelRes = await fetch(
-    'https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_ParcelBoundaries/MapServer/0/query' +
-    '?geometry=' + lon + '%2C' + lat +
-    '&geometryType=esriGeometryPoint&inSR=4326' +
-    '&spatialRel=esriSpatialRelIntersects' +
-    '&outFields=ACCTID%2CSDATWEBADR&returnGeometry=false&f=json',
-    { signal: AbortSignal.timeout(8000) }
-  );
-  if (!parcelRes.ok) throw new Error('parcel query error');
-  const parcelData = await parcelRes.json();
-  if (!parcelData.features || !parcelData.features.length) return null;
-
-  const a = parcelData.features[0].attributes;
-  return { acctId: (a.ACCTID || '').trim(), sdatUrl: (a.SDATWEBADR || '').trim() };
-}
 
 /* ---------- main calculation ---------- */
 function calculate(){
@@ -842,6 +745,7 @@ function calculate(){
   const closingCosts = num('closing-costs');
   const lenderTitle = num('lender-title');
   const ownerTitle = num('owner-title');
+  const titleSettlementTotal = titleSettlementFeesTotal();
   const sellerCredit = num('seller-credit');
   const discountPointsPct = num('discount-points-pct');
   const originationCreditPct = num('origination-credit-pct');
@@ -862,7 +766,7 @@ function calculate(){
 
   const reservesTotal = dailyInt + hoiPrepaid + hazardEscrow + taxEscrow;
 
-  const cashToClose = downPayment + closingCosts + lenderTitle + ownerTitle + transferTotal + reservesTotal +
+  const cashToClose = downPayment + closingCosts + lenderTitle + ownerTitle + titleSettlementTotal + transferTotal + reservesTotal +
                        (ufmipFull-ufmipFinanced) - dpa - sellerCredit + discountPointsAmount - originationCreditAmount;
 
   window.__lastCalc = {
@@ -870,7 +774,7 @@ function calculate(){
     ufmipFull, ufmipFinanced, totalLoan, dpa, financeUpfront,
     pi, hazardMonthly, taxMonthly, miMonthly, hoaMonthly, totalMonthly,
     stateTransfer, countyTransfer, recordation, transferTotal,
-    closingCosts, lenderTitle, ownerTitle, sellerCredit,
+    closingCosts, lenderTitle, ownerTitle, titleSettlementTotal, sellerCredit,
     discountPointsAmount, originationCreditAmount, cashToClose,
     closingMonth, closingDay, prepaidDays: days, dailyInt, hoiPrepaid, hazardEscrow, taxEscrow, reservesTotal
   };
@@ -935,8 +839,14 @@ function renderResults(){
   $('r-total-monthly').textContent = money(c.totalMonthly);
 
   $('r-closing').textContent = money(c.closingCosts);
+  $('r-title-settlement-total').textContent = money(c.lenderTitle + c.ownerTitle + c.titleSettlementTotal);
   $('r-lender-title').textContent = money(c.lenderTitle);
   $('r-owner-title').textContent = money(c.ownerTitle);
+  $('r-title-exam').textContent = money(TITLE_SETTLEMENT_FEES.titleExaminationFee);
+  $('r-title-abstract').textContent = money(TITLE_SETTLEMENT_FEES.titleAbstractFee);
+  $('r-admin-fee').textContent = money(TITLE_SETTLEMENT_FEES.adminFee);
+  $('r-title-binder').textContent = money(TITLE_SETTLEMENT_FEES.titleBinderFee);
+  $('r-cpl').textContent = money(TITLE_SETTLEMENT_FEES.closingProtectionLetter);
   $('r-transfer').textContent = money(c.transferTotal);
   $('r-reserves').textContent = money(c.reservesTotal);
   $('r-points-row').style.display = c.discountPointsAmount ? '' : 'none';
@@ -979,8 +889,7 @@ function buildText(){
   t += 'Total: ' + money(c.totalMonthly) + '\n\n';
   t += 'Cash to Close\n';
   t += 'Closing Costs: ' + money(c.closingCosts) + '\n';
-  t += "Lender's Title Insurance: " + money(c.lenderTitle) + '\n';
-  t += "Owner's Title Insurance: " + money(c.ownerTitle) + '\n';
+  t += 'Title & Settlement: ' + money(c.lenderTitle + c.ownerTitle + c.titleSettlementTotal) + '\n';
   t += 'Transfer Taxes: ' + money(c.transferTotal) + '\n';
   t += 'Prepaids/Reserves: ' + money(c.reservesTotal) + '\n';
   if (c.dpa) t += 'DPA (' + $('dpa-pct').value + '% MMP): -' + money(c.dpa) + '\n';
@@ -1009,8 +918,7 @@ function buildMarkdown(){
   t += '- **Total: ' + money(c.totalMonthly) + '**\n\n';
   t += '**Cash to Close**\n';
   t += '- Closing Costs: ' + money(c.closingCosts) + '\n';
-  t += "- Lender's Title Insurance: " + money(c.lenderTitle) + '\n';
-  t += "- Owner's Title Insurance: " + money(c.ownerTitle) + '\n';
+  t += '- Title & Settlement: ' + money(c.lenderTitle + c.ownerTitle + c.titleSettlementTotal) + '\n';
   t += '- Transfer Taxes: ' + money(c.transferTotal) + '\n';
   t += '- Prepaids/Reserves: ' + money(c.reservesTotal) + '\n';
   if (c.dpa) t += '- DPA (' + $('dpa-pct').value + '% MMP): -' + money(c.dpa) + '\n';
@@ -1047,7 +955,6 @@ function saveDefaults(){
   try{
     const defaults = {
       rate: $('rate').value, term: $('term').value,
-      closingCosts: $('closing-costs').value,
       ufmipPct: $('ufmip-pct').value, county: $('county').value,
       transferSplit: $('transfer-split').value, cushionCap: $('cushion-cap-months').value
     };
@@ -1062,7 +969,6 @@ function loadDefaults(){
     const d = JSON.parse(raw);
     if (d.rate) $('rate').value = d.rate;
     if (d.term) $('term').value = d.term;
-    if (d.closingCosts){ $('closing-costs').value = d.closingCosts; fieldLock.closingCosts = true; }
     if (d.ufmipPct) $('ufmip-pct').value = d.ufmipPct;
     if (d.county) $('county').value = d.county;
     if (d.transferSplit) $('transfer-split').value = d.transferSplit;
