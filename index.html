@@ -25,7 +25,7 @@ body{background:#f5f3ef;margin:0;}
   box-shadow:0 0 0px 1000px #fff inset;
   transition:background-color 5000s ease-in-out 0s;
 }
-.dml-h{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a07c58;margin:0 0 10px;}
+.dml-h{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a6840;margin:0 0 10px;}
 .dml-row{display:flex;gap:10px;margin-bottom:10px;}
 .dml-row>div{flex:1;min-width:0;}
 .dml-label{display:block;font-size:13px;color:#5a564d;margin-bottom:4px;}
@@ -46,10 +46,10 @@ body{background:#f5f3ef;margin:0;}
 .dml-result-row.total{border-top:1px solid #e8c8a0;margin-top:6px;padding-top:10px;font-weight:700;font-size:15px;}
 .dml-result-row.total span:last-child{font-size:18px;letter-spacing:-.02em;color:#b05a0a;}
 .dml-result-label{color:#5a564d;}
-.dml-small{font-size:11px;color:#9a958a;margin-top:6px;line-height:1.4;}
+.dml-small{font-size:11px;color:#706b60;margin-top:6px;line-height:1.4;}
 .dml-small a{color:#c0631a;text-decoration:none;}
 .dml-small a:hover{text-decoration:underline;}
-details.dml-card summary{cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a07c58;transition:color .15s ease;}
+details.dml-card summary{cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a6840;transition:color .15s ease;}
 details.dml-card summary:hover{color:#5a564d;}
 details.dml-card[open] summary{margin-bottom:10px;}
 .dml-check input[type=radio]{accent-color:#f4791f;width:16px;height:16px;}
@@ -116,8 +116,8 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
   </div>
   <div class="dml-row">
     <div><label class="dml-label">Down payment %</label><input type="number" step="0.01" id="down-pct" value="3.5" autocomplete="off" oninput="onDownPctInput()"></div>
-    <div><label class="dml-label">Rate %</label><input type="number" step="0.001" id="rate" autocomplete="off"></div>
-    <div><label class="dml-label">Term (yrs)</label><input type="number" id="term" autocomplete="off"></div>
+    <div><label class="dml-label">Rate %</label><input type="number" step="0.001" id="rate" placeholder="e.g. 6.75" autocomplete="off"></div>
+    <div><label class="dml-label">Term (yrs)</label><input type="number" id="term" value="30" autocomplete="off"></div>
   </div>
 
   <div id="fha-row" class="dml-row">
@@ -216,7 +216,7 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
 <div id="status-msg" style="display:none;background:#fff4e8;border:1px solid #f4c98a;color:#7a4a10;font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:12px;"></div>
 
 <div class="dml-sticky-bar">
-<button type="button" class="dml-btn" onclick="calculate()">Calculate</button>
+<button type="button" id="calc-btn" class="dml-btn" onclick="calculate()">Calculate</button>
 </div>
 
 <div id="calc-warnings" style="display:none;background:#fff4e8;border:1px solid #f4c98a;color:#7a4a10;font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:12px;line-height:1.5;"></div>
@@ -281,7 +281,7 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
       </div>
     </div>
     <details style="margin-top:12px;">
-      <summary style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a07c58;cursor:pointer;">Letter dates</summary>
+      <summary style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a6840;cursor:pointer;">Letter dates</summary>
       <div class="dml-row" style="margin-top:10px;">
         <div><label class="dml-label">Letter date</label><input type="date" id="letter-date" autocomplete="off"></div>
         <div><label class="dml-label">Valid for, days</label><input type="number" id="valid-days" value="90" autocomplete="off"></div>
@@ -719,16 +719,31 @@ function initZipCache(){
 
 
 /* ---------- main calculation ---------- */
+function highlightField(id){
+  const el = $(id);
+  el.style.borderColor = '#f4791f';
+  el.style.boxShadow = '0 0 0 2px rgba(244,121,31,.15)';
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+  el.focus();
+  el.addEventListener('input', function(){ el.style.borderColor=''; el.style.boxShadow=''; }, {once:true});
+}
+
 function calculate(){
   showStatus('');
   const price = num('price');
-  if (!price){ showStatus('Enter a purchase price before calculating.'); return; }
+  if (!price){ showStatus('Enter a purchase price before calculating.'); highlightField('price'); return; }
 
   const rateCheck = num('rate');
   if (!rateCheck || rateCheck <= 0){
     showStatus('Enter an interest rate greater than 0% before calculating.');
+    highlightField('rate');
     return;
   }
+
+  const btn = $('calc-btn');
+  btn.disabled = true;
+  btn.textContent = 'Calculating…';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
 
   const loanType = $('loan-type').value;
   const downPct = num('down-pct')/100;
@@ -846,6 +861,9 @@ function calculate(){
   renderResults();
   checkWarnings(window.__lastCalc);
   saveDefaults();
+  btn.disabled = false;
+  btn.textContent = 'Calculate';
+  }));
 }
 
 /* ---------- warnings ---------- */
@@ -1020,7 +1038,6 @@ function getAddress(){
 function saveDefaults(){
   try{
     const defaults = {
-      rate: $('rate').value, term: $('term').value,
       ufmipPct: $('ufmip-pct').value, county: $('county').value,
       transferSplit: $('transfer-split').value, recordationSplit: $('recordation-split').value, recordingFees: $('recording-fees').value, cushionCap: $('cushion-cap-months').value
     };
@@ -1033,8 +1050,6 @@ function loadDefaults(){
     const raw = localStorage.getItem('dml-calc-defaults');
     if (!raw) return;
     const d = JSON.parse(raw);
-    if (d.rate) $('rate').value = d.rate;
-    if (d.term) $('term').value = d.term;
     if (d.ufmipPct) $('ufmip-pct').value = d.ufmipPct;
     if (d.county) $('county').value = d.county;
     if (d.transferSplit) $('transfer-split').value = d.transferSplit;
