@@ -122,7 +122,7 @@ details[open]>.dml-summary>.dml-arrow{transform:rotate(90deg);}
   </div>
   <div class="dml-row">
     <div><label class="dml-label">Down payment %</label><input type="number" step="0.01" id="down-pct" value="3.5" autocomplete="off" oninput="onDownPctInput()"></div>
-    <div><label class="dml-label">Rate %</label><input type="number" step="0.001" inputmode="decimal" id="rate" placeholder="e.g. 6.75" autocomplete="off"></div>
+    <div><label class="dml-label">Rate %</label><input type="number" step="0.001" inputmode="decimal" id="rate" placeholder="e.g. 6.75" autocomplete="off" onkeydown="if(event.key==='Enter'){calculate();}"></div>
     <div><label class="dml-label">Term (yrs)</label><input type="number" id="term" value="30" autocomplete="off"></div>
   </div>
 
@@ -747,6 +747,12 @@ function highlightField(id){
   el.focus();
   el.addEventListener('input', function(){ el.style.borderColor=''; el.style.boxShadow=''; }, {once:true});
 }
+function markField(id){
+  const el=$(id); if(!el) return;
+  el.style.borderColor='#f4791f';
+  el.style.boxShadow='0 0 0 2px rgba(244,121,31,.15)';
+  el.addEventListener('input',function(){ el.style.borderColor=''; el.style.boxShadow=''; },{once:true});
+}
 
 function calculate(){
   showStatus('');
@@ -906,17 +912,17 @@ function checkWarnings(c){
   const warns = [];
   const ltv = c.baseLoan / c.price;
   if (c.loanType === 'Conventional' && ltv > 0.97)
-    warns.push('LTV is ' + (ltv*100).toFixed(1) + '% on Conventional — most programs cap at 97%. Check down payment.');
+    warns.push('LTV is ' + (ltv*100).toFixed(1) + '% on Conventional — most programs cap at 97%. Check down payment.'); markField('down-pct');
   if (c.loanType === 'FHA' && ltv > 0.965)
-    warns.push('FHA base LTV exceeds 96.5% — minimum down payment is 3.5% of purchase price.');
+    warns.push('FHA base LTV exceeds 96.5% — minimum down payment is 3.5% of purchase price.'); markField('down-pct');
   if (c.loanType === 'VA' && ltv > 1.00)
-    warns.push('VA loan LTV above 100% — verify funding fee financing is correct.');
+    warns.push('VA loan LTV above 100% — verify funding fee financing is correct.'); markField('down-pct');
   if (c.rate * 100 > 9)
-    warns.push('Rate is ' + (c.rate*100).toFixed(3) + '% — above 9%, confirm this is intentional.');
+    warns.push('Rate is ' + (c.rate*100).toFixed(3) + '% — above 9%, confirm this is intentional.'); markField('rate');
   if (c.rate * 100 < 2)
-    warns.push('Rate is ' + (c.rate*100).toFixed(3) + '% — below 2%, confirm this is correct.');
+    warns.push('Rate is ' + (c.rate*100).toFixed(3) + '% — below 2%, confirm this is correct.'); markField('rate');
   if (c.cashToClose < 0)
-    warns.push('Cash to close is negative (' + money(c.cashToClose) + ') — credits exceed total charges. Verify seller credit and DPA entries.');
+    warns.push('Cash to close is negative (' + money(c.cashToClose) + ') — credits exceed total charges. Verify seller credit and DPA entries.'); markField('seller-credit');
   const ccPct = c.totalLoan > 0 ? (c.closingCosts / c.totalLoan) * 100 : 0;
   if (ccPct > 6)
     warns.push('Closing costs are ' + ccPct.toFixed(1) + '% of the loan — unusually high. Check fee entries.');
@@ -927,6 +933,7 @@ function renderWarnings(warns){
   if (!el) return;
   if (!warns.length){ el.style.display = 'none'; el.innerHTML = ''; return; }
   el.style.display = '';
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
   el.style.animation = 'none'; void el.offsetWidth;
   el.style.animation = 'fadeIn 200ms cubic-bezier(0.25,1,0.5,1) both';
   el.innerHTML = warns.map(w =>
