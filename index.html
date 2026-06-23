@@ -1279,7 +1279,7 @@ function generateLetter(){
     dlLink.href = url;
     dlLink.download = fileName;
     dlLink.className = 'dml-btn';
-    dlLink.style.display = 'block';
+    dlLink.style.cssText = 'display:block;text-decoration:none;';
     dlLink.textContent = 'Download PDF';
     box.appendChild(dlLink);
   }
