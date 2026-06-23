@@ -228,7 +228,7 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
 
 <div class="dml-sticky-bar">
 <button type="button" id="calc-btn" class="dml-btn" onclick="calculate()">Calculate</button>
-<button type="button" id="new-quote-btn" class="dml-btn dml-btn-secondary" onclick="newQuote()" style="display:none;margin-top:8px;">New quote</button>
+<button type="button" id="new-quote-btn" onclick="newQuote()" style="display:none;background:none;border:none;color:#a07c58;font-size:13px;font-family:'Hanken Grotesk',system-ui,sans-serif;cursor:pointer;padding:6px 0 2px;width:100%;text-align:center;">+ New quote</button>
 </div>
 
 <div id="calc-warnings" style="display:none;background:#fff4e8;border:1px solid #f4c98a;color:#7a4a10;font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:12px;line-height:1.5;"></div>
@@ -255,13 +255,18 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
     <p class="dml-h">Cash to close</p>
     <div class="dml-result-row"><span class="dml-result-label">Closing costs</span><span id="r-closing"></span></div>
     <div class="dml-result-row" style="margin-top:6px;"><span class="dml-result-label" style="font-weight:700;color:#3a3730;">Title &amp; Settlement</span><span id="r-title-settlement-total" style="font-weight:700;"></span></div>
-    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Lender's title</span><span id="r-lender-title"></span></div>
-    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Owner's title</span><span id="r-owner-title"></span></div>
-    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Title examination</span><span id="r-title-exam"></span></div>
-    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Title abstract</span><span id="r-title-abstract"></span></div>
-    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Admin</span><span id="r-admin-fee"></span></div>
-    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Title binder</span><span id="r-title-binder"></span></div>
-    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Closing protection letter</span><span id="r-cpl"></span></div>
+    <details>
+      <summary style="font-size:11px;color:#a07c58;cursor:pointer;list-style:none;margin:3px 0 4px 0;">View line items</summary>
+      <div>
+        <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Lender's title</span><span id="r-lender-title"></span></div>
+        <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Owner's title</span><span id="r-owner-title"></span></div>
+        <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Title examination</span><span id="r-title-exam"></span></div>
+        <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Title abstract</span><span id="r-title-abstract"></span></div>
+        <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Admin</span><span id="r-admin-fee"></span></div>
+        <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Title binder</span><span id="r-title-binder"></span></div>
+        <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Closing protection letter</span><span id="r-cpl"></span></div>
+      </div>
+    </details>
     <div class="dml-result-row" style="margin-top:6px;"><span class="dml-result-label">Transfer taxes</span><span id="r-transfer"></span></div>
     <div class="dml-small" style="margin-bottom:6px;">Includes Maryland state/county transfer taxes and recordation stamps per local jurisdiction rules.</div>
     <div class="dml-result-row"><span class="dml-result-label">Prepaids/reserves</span><span id="r-reserves"></span></div>
