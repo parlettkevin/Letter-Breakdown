@@ -292,7 +292,7 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
         <div><label class="dml-label">Credit verified</label><input type="date" id="credit-date" autocomplete="off"></div>
       </div>
     </details>
-    <button type="button" class="dml-btn dml-btn-secondary" id="copy-btn" onclick="copyText()" style="margin-top:12px;">Copy Text</button>
+    <button type="button" class="dml-btn dml-btn-secondary" id="copy-btn" onclick="copyText()" style="margin-top:12px;">Copy Loan Summary</button>
     <button type="button" id="generate-pdf-btn" class="dml-btn" onclick="generateLetter()" style="margin-top:8px;">Download preapproval letter (PDF)</button>
     <div id="pdf-output" style="display:none;margin-top:12px;"></div>
   </div>
@@ -925,7 +925,9 @@ function renderResults(){
   $('r-tax').textContent = money(c.taxMonthly);
   $('r-mi-row').style.display = c.miMonthly ? '' : 'none';
   $('r-mi').textContent = money(c.miMonthly);
-  $('r-hoa').textContent = money(c.hoaMonthly);
+  const hoaRow = $('r-hoa').closest('.dml-result-row');
+  if (c.hoaMonthly) { $('r-hoa').textContent = money(c.hoaMonthly); hoaRow.style.display = ''; }
+  else { hoaRow.style.display = 'none'; }
   $('r-total-monthly').textContent = money(c.totalMonthly);
 
   $('r-closing').textContent = money(c.closingCosts);
@@ -982,7 +984,7 @@ function buildCopyText(){
     'Taxes: ' + money(c.taxMonthly),
     'Home Insurance: ' + money(c.hazardMonthly),
     'PMI/MIP: ' + money(c.miMonthly || 0),
-    'HOA: ' + money(c.hoaMonthly || 0),
+    ...(c.hoaMonthly ? ['HOA: ' + money(c.hoaMonthly)] : []),
     '',
     'CASH TO CLOSE',
     'Down Payment: ' + money(c.downPayment),
