@@ -1274,10 +1274,11 @@ function generateLetter(){
   box.style.display = '';
 
   const url = URL.createObjectURL(blob);
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
 
-  if (navigator.canShare && navigator.canShare({files:[file]})){
-    /* iOS/Android: blob download links open a new tab instead of downloading.
-       Use the share sheet exclusively — it covers Mail, AirDrop, Files, etc. */
+  if (isIOS && navigator.canShare && navigator.canShare({files:[file]})){
+    /* iOS: blob download links open a new tab instead of downloading.
+       Use the share sheet — covers Mail, AirDrop, Save to Files, etc. */
     const shareBtn = document.createElement('button');
     shareBtn.type = 'button';
     shareBtn.className = 'dml-btn';
@@ -1286,7 +1287,7 @@ function generateLetter(){
     shareBtn.onclick = () => navigator.share({files:[file], title:fileName}).catch(()=>{});
     box.appendChild(shareBtn);
   } else {
-    /* Desktop: direct download anchor works correctly */
+    /* Desktop / Android: direct download anchor */
     const dlLink = document.createElement('a');
     dlLink.href = url;
     dlLink.download = fileName;
