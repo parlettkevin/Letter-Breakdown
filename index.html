@@ -59,6 +59,20 @@ details.dml-card[open] summary{margin-bottom:10px;}
 .dml-price-wrap input{padding-left:20px!important;}
 .dml-sticky-bar{position:sticky;bottom:0;background:#fff;padding:10px 0 max(env(safe-area-inset-bottom),6px);border-top:1px solid #e7e3da;z-index:10;margin-top:12px;}
 .dml-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+
+/* ── Animations ── */
+@keyframes resultCardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes detailsIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1) both;}
+
+.dml-btn-secondary.copy-success{background:#f2faf2;border-color:#7cb97c;color:#2a6a2a;
+  transition:background .2s ease,border-color .2s ease,color .2s ease;}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+}
 </style>
 
 <div style="text-align:center;padding:18px 0 6px;">
@@ -396,7 +410,11 @@ function showStatus(msg){
   const el = $('status-msg');
   if (!el) return;
   el.textContent = msg;
-  el.style.display = msg ? '' : 'none';
+  if (msg) {
+    el.style.display = '';
+    el.style.animation = 'none'; void el.offsetWidth;
+    el.style.animation = 'fadeIn 200ms cubic-bezier(0.25,1,0.5,1) both';
+  } else { el.style.display = 'none'; }
 }
 
 function populateCounties(){
@@ -842,6 +860,8 @@ function renderWarnings(warns){
   if (!el) return;
   if (!warns.length){ el.style.display = 'none'; el.innerHTML = ''; return; }
   el.style.display = '';
+  el.style.animation = 'none'; void el.offsetWidth;
+  el.style.animation = 'fadeIn 200ms cubic-bezier(0.25,1,0.5,1) both';
   el.innerHTML = warns.map(w =>
     '<div style="display:flex;gap:6px;align-items:baseline;margin-bottom:4px;">' +
     '<span style="font-weight:700;">&#9888;</span><span>' + w + '</span></div>'
@@ -855,6 +875,11 @@ function renderResults(){
   const c = window.__lastCalc;
   if (!c) return;
   $('results').style.display = '';
+  $('results').querySelectorAll('.dml-card').forEach((card,i)=>{
+    card.style.animation='none';
+    void card.offsetWidth;
+    card.style.animation=`resultCardIn 350ms cubic-bezier(0.25,1,0.5,1) ${i*60}ms both`;
+  });
   requestAnimationFrame(()=>$('results').scrollIntoView({behavior:'smooth',block:'start'}));
 
   $('r-price').textContent = money(c.price);
@@ -945,8 +970,9 @@ function copyText(){
   const flash = () => {
     const btn = $('copy-btn');
     const orig = btn.textContent;
-    btn.textContent = 'Copied!';
-    setTimeout(()=>{ btn.textContent = orig; }, 1500);
+    btn.textContent = 'Copied ✓';
+    btn.classList.add('copy-success');
+    setTimeout(()=>{ btn.textContent = orig; btn.classList.remove('copy-success'); }, 1500);
   };
   /* execCommand must run synchronously inside the user-gesture (this click).
      navigator.clipboard.writeText URL-encodes plain text on iOS 13/14 Safari. */
