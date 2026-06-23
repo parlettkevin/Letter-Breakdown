@@ -1159,7 +1159,7 @@ function generateLetter(){
   let y = 72;
 
   doc.addImage('data:image/png;base64,'+LOGO_B64, 'PNG', marginX, y, 260, 260*LOGO_RATIO);
-  doc.addImage('data:image/png;base64,'+BADGE_B64, 'PNG', pageW-marginX-120, y, 100, 100*BADGE_RATIO);
+  doc.addImage('data:image/png;base64,'+BADGE_B64, 'PNG', pageW-marginX-104, y+28, 90, 90*BADGE_RATIO);
   y += 260*LOGO_RATIO + 28;
 
   doc.setFont(font,'normal'); doc.setFontSize(bodySize);
