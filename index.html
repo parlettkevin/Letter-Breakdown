@@ -189,6 +189,7 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
   <div class="dml-check"><input type="checkbox" id="fthb"><label for="fthb">First time MD homebuyer (state transfer tax exempt)</label></div>
   <div class="dml-row">
     <div><label class="dml-label">County transfer split, buyer %</label><input type="number" id="transfer-split" value="50" autocomplete="off"></div>
+    <div><label class="dml-label">Recordation split, buyer %</label><input type="number" id="recordation-split" value="50" autocomplete="off"></div>
   </div>
   <div class="dml-small">Transfer/recordation tax is auto calculated from the county selected above in the tax section.</div>
 </div>
@@ -786,7 +787,8 @@ function calculate(){
   let recordation = 0;
   if (cd.recordation !== null && cd.recordation !== undefined){
     const units = Math.ceil(totalLoan/500);
-    recordation = units*cd.recordation;
+    const recordationSplit = num('recordation-split')/100;
+    recordation = units*cd.recordation*recordationSplit;
   }
   const transferTotal = stateTransfer + countyTransfer + recordation;
 
@@ -1009,7 +1011,7 @@ function saveDefaults(){
     const defaults = {
       rate: $('rate').value, term: $('term').value,
       ufmipPct: $('ufmip-pct').value, county: $('county').value,
-      transferSplit: $('transfer-split').value, cushionCap: $('cushion-cap-months').value
+      transferSplit: $('transfer-split').value, recordationSplit: $('recordation-split').value, cushionCap: $('cushion-cap-months').value
     };
     localStorage.setItem('dml-calc-defaults', JSON.stringify(defaults));
   }catch(e){ /* non-fatal, e.g. private browsing storage restrictions */ }
@@ -1025,6 +1027,7 @@ function loadDefaults(){
     if (d.ufmipPct) $('ufmip-pct').value = d.ufmipPct;
     if (d.county) $('county').value = d.county;
     if (d.transferSplit) $('transfer-split').value = d.transferSplit;
+    if (d.recordationSplit) $('recordation-split').value = d.recordationSplit;
     if (d.cushionCap) $('cushion-cap-months').value = d.cushionCap;
     onCountyChange();
   }catch(e){ /* first run, or storage unavailable, ignore */ }
