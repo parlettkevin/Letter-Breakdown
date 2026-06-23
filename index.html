@@ -116,7 +116,7 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
   </div>
   <div class="dml-row">
     <div><label class="dml-label">Down payment %</label><input type="number" step="0.01" id="down-pct" value="3.5" autocomplete="off" oninput="onDownPctInput()"></div>
-    <div><label class="dml-label">Rate %</label><input type="number" step="0.001" id="rate" placeholder="e.g. 6.75" autocomplete="off"></div>
+    <div><label class="dml-label">Rate %</label><input type="number" step="0.001" inputmode="decimal" id="rate" placeholder="e.g. 6.75" autocomplete="off"></div>
     <div><label class="dml-label">Term (yrs)</label><input type="number" id="term" value="30" autocomplete="off"></div>
   </div>
 
@@ -1256,28 +1256,27 @@ function generateLetter(){
   box.innerHTML = '';
   box.style.display = '';
 
-  /* Always provide a direct download anchor — works reliably on desktop and
-     modern iOS. Also show a Share button when the Web Share API supports files
-     (iOS share sheet, Android). Both options together means no platform is left
-     without a working path. */
   const url = URL.createObjectURL(blob);
 
-  const dlLink = document.createElement('a');
-  dlLink.href = url;
-  dlLink.download = fileName;
-  dlLink.className = 'dml-btn';
-  dlLink.style.display = 'block';
-  dlLink.textContent = 'Download PDF';
-  box.appendChild(dlLink);
-
   if (navigator.canShare && navigator.canShare({files:[file]})){
+    /* iOS/Android: blob download links open a new tab instead of downloading.
+       Use the share sheet exclusively — it covers Mail, AirDrop, Files, etc. */
     const shareBtn = document.createElement('button');
     shareBtn.type = 'button';
-    shareBtn.className = 'dml-btn dml-btn-secondary';
-    shareBtn.style.cssText = 'width:100%;display:block;margin-top:8px;';
-    shareBtn.textContent = 'Share / Save PDF';
+    shareBtn.className = 'dml-btn';
+    shareBtn.style.cssText = 'width:100%;display:block;';
+    shareBtn.textContent = 'Share / Email PDF';
     shareBtn.onclick = () => navigator.share({files:[file], title:fileName}).catch(()=>{});
     box.appendChild(shareBtn);
+  } else {
+    /* Desktop: direct download anchor works correctly */
+    const dlLink = document.createElement('a');
+    dlLink.href = url;
+    dlLink.download = fileName;
+    dlLink.className = 'dml-btn';
+    dlLink.style.display = 'block';
+    dlLink.textContent = 'Download PDF';
+    box.appendChild(dlLink);
   }
 
   pdfBtn.disabled = false;
