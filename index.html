@@ -69,6 +69,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
 
 details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1) both;}
 
+.dml-card-answer{background:#fdf8f4;border-color:#e0c8a8;}
 .dml-btn-secondary.copy-success{background:#f2faf2;border-color:#7cb97c;color:#2a6a2a;
   transition:background .2s ease,border-color .2s ease,color .2s ease;}
 
@@ -187,15 +188,20 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
   <div class="dml-row">
     <div><label class="dml-label">Seller credit $</label><input type="number" id="seller-credit" value="0" autocomplete="off"></div>
   </div>
-  <div class="dml-check"><input type="checkbox" id="fthb"><label for="fthb">First time MD homebuyer (state transfer tax exempt)</label></div>
-  <div class="dml-row">
-    <div><label class="dml-label">County transfer split, buyer %</label><input type="number" id="transfer-split" value="50" autocomplete="off"></div>
-    <div><label class="dml-label">Recordation split, buyer %</label><input type="number" id="recordation-split" value="50" autocomplete="off"></div>
-  </div>
-  <div class="dml-row">
-    <div><label class="dml-label">Govt recording fees $</label><input type="number" id="recording-fees" value="125" autocomplete="off"></div>
-  </div>
-  <div class="dml-small">Transfer/recordation tax is auto calculated from the county selected above in the tax section.</div>
+  <details style="margin-top:10px;">
+    <summary style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a07c58;cursor:pointer;">Transfer & recording tax</summary>
+    <div style="margin-top:10px;">
+      <div class="dml-check"><input type="checkbox" id="fthb"><label for="fthb">First time MD homebuyer (state transfer tax exempt)</label></div>
+      <div class="dml-row" style="margin-top:8px;">
+        <div><label class="dml-label">County transfer split, buyer %</label><input type="number" id="transfer-split" value="50" autocomplete="off"></div>
+        <div><label class="dml-label">Recordation split, buyer %</label><input type="number" id="recordation-split" value="50" autocomplete="off"></div>
+      </div>
+      <div class="dml-row">
+        <div><label class="dml-label">Govt recording fees $</label><input type="number" id="recording-fees" value="125" autocomplete="off"></div>
+      </div>
+      <div class="dml-small">Transfer/recordation tax is auto calculated from the county selected above in the tax section.</div>
+    </div>
+  </details>
 </div>
 
 
@@ -224,7 +230,7 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
     <div class="dml-result-row"><span class="dml-result-label">Rate</span><span id="r-rate"></span></div>
     <div class="dml-result-row"><span class="dml-result-label">Term</span><span id="r-term"></span></div>
   </div>
-  <div class="dml-card">
+  <div class="dml-card dml-card-answer">
     <p class="dml-h">Monthly payment</p>
     <div class="dml-result-row"><span class="dml-result-label">P&amp;I</span><span id="r-pi"></span></div>
     <div class="dml-result-row"><span class="dml-result-label">Hazard</span><span id="r-hazard"></span></div>
@@ -287,7 +293,7 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
       </div>
     </details>
     <button type="button" class="dml-btn dml-btn-secondary" id="copy-btn" onclick="copyText()" style="margin-top:12px;">Copy Text</button>
-    <button type="button" class="dml-btn" onclick="generateLetter()" style="margin-top:8px;">Download preapproval letter (PDF)</button>
+    <button type="button" id="generate-pdf-btn" class="dml-btn" onclick="generateLetter()" style="margin-top:8px;">Download preapproval letter (PDF)</button>
     <div id="pdf-output" style="display:none;margin-top:12px;"></div>
   </div>
 </div>
@@ -1111,6 +1117,9 @@ function addDays(d, days){
 function generateLetter(){
   showStatus('');
   if (!window.jspdf){ showStatus('PDF library still loading, give it a second and tap again.'); return; }
+  const pdfBtn = $('generate-pdf-btn');
+  pdfBtn.disabled = true;
+  pdfBtn.textContent = 'Generating…';
   const c = window.__lastCalc || (() => {
     const price    = num('price');
     const downPct  = num('down-pct') / 100;
@@ -1266,6 +1275,8 @@ function generateLetter(){
     box.appendChild(shareBtn);
   }
 
+  pdfBtn.disabled = false;
+  pdfBtn.textContent = 'Download preapproval letter (PDF)';
   requestAnimationFrame(()=>box.scrollIntoView({behavior:'smooth',block:'nearest'}));
 
 }
