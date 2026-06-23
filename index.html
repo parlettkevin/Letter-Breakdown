@@ -236,7 +236,6 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <div class="dml-small">Includes down payment.</div>
   </div>
 
-  <button type="button" class="dml-btn dml-btn-secondary" id="copy-btn" onclick="copyText()" style="margin-bottom:10px;">Copy Text</button>
   <div class="dml-card">
     <p class="dml-h">Download options</p>
     <div class="dml-check">
@@ -267,7 +266,8 @@ details.dml-card[open] summary{margin-bottom:10px;}
         <div><label class="dml-label">Credit verified</label><input type="date" id="credit-date" autocomplete="off"></div>
       </div>
     </details>
-    <button type="button" class="dml-btn" onclick="generateLetter()" style="margin-top:12px;">Download preapproval letter (PDF)</button>
+    <button type="button" class="dml-btn dml-btn-secondary" id="copy-btn" onclick="copyText()" style="margin-top:12px;">Copy Text</button>
+    <button type="button" class="dml-btn" onclick="generateLetter()" style="margin-top:8px;">Download preapproval letter (PDF)</button>
     <div id="pdf-output" style="display:none;margin-top:12px;"></div>
   </div>
 </div>
