@@ -309,19 +309,6 @@ const BADGE_B64 = "iVBORw0KGgoAAAANSUhEUgAAAT8AAADXCAYAAABsxlbwAAEAAElEQVR4nOz9x
 const LOGO_RATIO = 0.16714285714285715;
 const BADGE_RATIO = 0.6739811912225705;
 
-// Pre-render badge with top padding so PDF viewers don't clip the circle edge
-window.__badgePadded = null;
-(function(){
-  const img = new Image();
-  img.onload = function(){
-    const PAD = 24; // transparent px above circle
-    const c = document.createElement('canvas');
-    c.width = 319; c.height = 215 + PAD;
-    c.getContext('2d').drawImage(img, 0, PAD);
-    window.__badgePadded = { src: c.toDataURL('image/png'), ratio: (215 + PAD) / 319 };
-  };
-  img.src = 'data:image/png;base64,' + BADGE_B64;
-}());
 /* ---------- Maryland county data ---------- */
 const STATE_TRANSFER_PCT = 0.5;
 const STATE_PROPTAX_RATE = 0.1120;
@@ -1164,6 +1151,7 @@ function generateLetter(){
   const assetsDate = $('assets-date').value ? new Date($('assets-date').value+'T12:00:00') : letterDate;
   const creditDate = $('credit-date').value ? new Date($('credit-date').value+'T12:00:00') : letterDate;
 
+  function proceed(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({unit:'pt', format:'letter'});
   const pageW = 612, marginX = 54;
@@ -1300,7 +1288,23 @@ function generateLetter(){
   pdfBtn.disabled = false;
   pdfBtn.textContent = 'Download preapproval letter (PDF)';
   requestAnimationFrame(()=>box.scrollIntoView({behavior:'smooth',block:'nearest'}));
+  } // end proceed()
 
+  if (window.__badgePadded) {
+    proceed();
+  } else {
+    const _bi = new Image();
+    _bi.onload = function(){
+      const PAD = 24;
+      const _bc = document.createElement('canvas');
+      _bc.width = 319; _bc.height = 215 + PAD;
+      _bc.getContext('2d').drawImage(_bi, 0, PAD);
+      window.__badgePadded = { src: _bc.toDataURL('image/png'), ratio: (215 + PAD) / 319 };
+      proceed();
+    };
+    _bi.onerror = proceed;
+    _bi.src = 'data:image/png;base64,' + BADGE_B64;
+  }
 }
 
 
