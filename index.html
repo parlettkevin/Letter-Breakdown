@@ -59,7 +59,8 @@ details.dml-card[open] summary{margin-bottom:10px;}
 .dml-price-wrap input{padding-left:20px!important;}
 .dml-sticky-bar{position:sticky;bottom:0;background:#fff;padding:10px 0 max(env(safe-area-inset-bottom),6px);border-top:1px solid #e7e3da;z-index:10;margin-top:12px;}
 .dml-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-.dml-grid-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.dml-grid-dates{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
+@media(max-width:360px){.dml-grid-dates{grid-template-columns:1fr 1fr;}}
 
 /* ── Animations ── */
 @keyframes resultCardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -190,6 +191,9 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
   <div class="dml-row">
     <div><label class="dml-label">County transfer split, buyer %</label><input type="number" id="transfer-split" value="50" autocomplete="off"></div>
     <div><label class="dml-label">Recordation split, buyer %</label><input type="number" id="recordation-split" value="50" autocomplete="off"></div>
+  </div>
+  <div class="dml-row">
+    <div><label class="dml-label">Govt recording fees $</label><input type="number" id="recording-fees" value="125" autocomplete="off"></div>
   </div>
   <div class="dml-small">Transfer/recordation tax is auto calculated from the county selected above in the tax section.</div>
 </div>
@@ -786,11 +790,12 @@ function calculate(){
 
   let recordation = 0;
   if (cd.recordation !== null && cd.recordation !== undefined){
-    const units = Math.ceil(totalLoan/500);
+    const units = Math.ceil(price/500);
     const recordationSplit = num('recordation-split')/100;
     recordation = units*cd.recordation*recordationSplit;
   }
-  const transferTotal = stateTransfer + countyTransfer + recordation;
+  const recordingFees = num('recording-fees');
+  const transferTotal = stateTransfer + countyTransfer + recordation + recordingFees;
 
   /* closing costs: flat lender/vendor fees, no title insurance baked in
      (title insurance is its own field below, since that's the piece that
@@ -826,7 +831,7 @@ function calculate(){
     price, loanType, downPct, downPayment, baseLoan, rate, termYears,
     ufmipFull, ufmipFinanced, totalLoan, dpa, financeUpfront,
     pi, hazardMonthly, taxMonthly, miMonthly, hoaMonthly, totalMonthly,
-    stateTransfer, countyTransfer, recordation, transferTotal,
+    stateTransfer, countyTransfer, recordation, recordingFees, transferTotal,
     closingCosts, lenderTitle, ownerTitle, titleSettlementTotal, sellerCredit,
     discountPointsAmount, originationCreditAmount, cashToClose,
     closingMonth, closingDay, prepaidDays: days, dailyInt, hoiPrepaid, hazardEscrow, taxEscrow, reservesTotal
@@ -1011,7 +1016,7 @@ function saveDefaults(){
     const defaults = {
       rate: $('rate').value, term: $('term').value,
       ufmipPct: $('ufmip-pct').value, county: $('county').value,
-      transferSplit: $('transfer-split').value, recordationSplit: $('recordation-split').value, cushionCap: $('cushion-cap-months').value
+      transferSplit: $('transfer-split').value, recordationSplit: $('recordation-split').value, recordingFees: $('recording-fees').value, cushionCap: $('cushion-cap-months').value
     };
     localStorage.setItem('dml-calc-defaults', JSON.stringify(defaults));
   }catch(e){ /* non-fatal, e.g. private browsing storage restrictions */ }
@@ -1028,6 +1033,7 @@ function loadDefaults(){
     if (d.county) $('county').value = d.county;
     if (d.transferSplit) $('transfer-split').value = d.transferSplit;
     if (d.recordationSplit) $('recordation-split').value = d.recordationSplit;
+    if (d.recordingFees !== undefined) $('recording-fees').value = d.recordingFees;
     if (d.cushionCap) $('cushion-cap-months').value = d.cushionCap;
     onCountyChange();
   }catch(e){ /* first run, or storage unavailable, ignore */ }
