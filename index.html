@@ -30,11 +30,11 @@ body{background:#f5f3ef;margin:0;}
 .dml-row>div{flex:1;min-width:0;}
 .dml-label{display:block;font-size:13px;color:#5a564d;margin-bottom:4px;}
 .dml-card input[type=text],.dml-card input[type=number],.dml-card input[type=date],.dml-card select{
-  width:100%;box-sizing:border-box;padding:8px 9px;border:1px solid #d8d3c6;border-radius:7px;font-size:15px;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#fff;color:#1d1d1d;}
+  width:100%;box-sizing:border-box;padding:11px 9px;border:1px solid #d8d3c6;border-radius:7px;font-size:16px;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#fff;color:#1d1d1d;}
 .dml-card input:focus,.dml-card select:focus{outline:none;border-color:#f4791f;box-shadow:0 0 0 2px rgba(244,121,31,.15);}
 .dml-check{display:flex;align-items:center;gap:8px;font-size:14px;color:#3a3730;margin:6px 0;}
 .dml-check input{width:16px;height:16px;}
-.dml-btn{display:inline-block;width:100%;text-align:center;padding:11px;border-radius:8px;border:none;
+.dml-btn{display:inline-block;width:100%;text-align:center;padding:13px 11px;border-radius:8px;border:none;
   background:#f4791f;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'Hanken Grotesk',system-ui,sans-serif;
   transition:background .15s ease,transform .1s ease;}
 .dml-btn:hover{background:#e06a16;}
@@ -55,10 +55,12 @@ details.dml-card[open] summary{margin-bottom:10px;}
 .dml-check input[type=radio]{accent-color:#f4791f;width:16px;height:16px;}
 .dml-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .dml-price-wrap{position:relative;}
-.dml-price-prefix{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:14.5px;color:#5a564d;pointer-events:none;user-select:none;}
+.dml-price-prefix{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:16px;color:#5a564d;pointer-events:none;user-select:none;}
 .dml-price-wrap input{padding-left:20px!important;}
 .dml-sticky-bar{position:sticky;bottom:0;background:#fff;padding:10px 0 max(env(safe-area-inset-bottom),6px);border-top:1px solid #e7e3da;z-index:10;margin-top:12px;}
 .dml-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.dml-grid-dates{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
+@media(max-width:380px){.dml-grid-dates{grid-template-columns:1fr 1fr;}}
 
 /* ── Animations ── */
 @keyframes resultCardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -274,7 +276,7 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
         <div><label class="dml-label">Letter date</label><input type="date" id="letter-date" autocomplete="off"></div>
         <div><label class="dml-label">Valid for, days</label><input type="number" id="valid-days" value="90" autocomplete="off"></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;">
+      <div class="dml-grid-dates">
         <div><label class="dml-label">Income verified</label><input type="date" id="income-date" autocomplete="off"></div>
         <div><label class="dml-label">Assets verified</label><input type="date" id="assets-date" autocomplete="off"></div>
         <div><label class="dml-label">Credit verified</label><input type="date" id="credit-date" autocomplete="off"></div>
