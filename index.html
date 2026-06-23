@@ -6,8 +6,10 @@
 <title>DML Quick Quote &amp; Preapproval Builder</title>
 </head>
 <body>
-<div style="max-width:480px;margin:0 auto;font-family:-apple-system,'Segoe UI',sans-serif;color:#1d1d1d;">
+<div class="dml-root">
 <style>
+body{background:#f5f3ef;margin:0;}
+.dml-root{max-width:480px;margin:0 auto;padding:0 0 24px;font-family:-apple-system,'Segoe UI',sans-serif;color:#1d1d1d;}
 .dml-card{background:#fff;border:1px solid #e7e3da;border-radius:10px;padding:16px;margin-bottom:14px;}
 /* Neutralize the browser's autofill highlight (the gray/yellow tint some
    browsers apply even when a field is otherwise empty of real user data),
@@ -30,15 +32,23 @@
 .dml-check{display:flex;align-items:center;gap:8px;font-size:13.5px;color:#3a3730;margin:6px 0;}
 .dml-check input{width:16px;height:16px;}
 .dml-btn{display:inline-block;width:100%;text-align:center;padding:11px;border-radius:8px;border:none;
-  background:#f4791f;color:#fff;font-size:15px;font-weight:600;cursor:pointer;}
+  background:#f4791f;color:#fff;font-size:15px;font-weight:600;cursor:pointer;
+  transition:background .15s ease,transform .1s ease;}
+.dml-btn:hover{background:#e06a16;}
 .dml-btn:active{transform:scale(.99);}
-.dml-btn-secondary{background:#fff;color:#1d1d1d;border:1px solid #d8d3c6;}
+.dml-btn:focus-visible{outline:2px solid #f4791f;outline-offset:2px;}
+.dml-btn-secondary{background:#faf9f7;color:#3a3730;border:1px solid #d8d3c6;}
+.dml-btn-secondary:hover{background:#f0ede8;border-color:#c8c3b6;}
 .dml-result-row{display:flex;justify-content:space-between;padding:5px 0;font-size:14px;}
 .dml-result-row.total{border-top:1px solid #e7e3da;margin-top:6px;padding-top:8px;font-weight:700;font-size:15px;}
 .dml-result-label{color:#5a564d;}
 .dml-small{font-size:11.5px;color:#9a958a;margin-top:6px;line-height:1.4;}
-details.dml-card summary{cursor:pointer;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#9a958a;}
+.dml-small a{color:#c0631a;text-decoration:none;}
+.dml-small a:hover{text-decoration:underline;}
+details.dml-card summary{cursor:pointer;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#9a958a;transition:color .15s ease;}
+details.dml-card summary:hover{color:#5a564d;}
 details.dml-card[open] summary{margin-bottom:10px;}
+.dml-check input[type=radio]{accent-color:#f4791f;width:16px;height:16px;}
 .dml-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .dml-price-wrap{position:relative;}
 .dml-price-prefix{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:14.5px;color:#5a564d;pointer-events:none;user-select:none;}
@@ -237,8 +247,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <div class="dml-small">Includes down payment.</div>
   </div>
 
-  <button type="button" class="dml-btn dml-btn-secondary" id="copy-btn" onclick="copyText()">Copy Text</button>
-  <div style="height:10px;"></div>
+  <button type="button" class="dml-btn dml-btn-secondary" id="copy-btn" onclick="copyText()" style="margin-bottom:10px;">Copy Text</button>
   <div class="dml-card">
     <p class="dml-h">Download options</p>
     <div class="dml-check">
@@ -257,8 +266,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
         </select>
       </div>
     </div>
-    <div style="height:10px;"></div>
-    <button type="button" class="dml-btn" onclick="generateLetter()">Download preapproval letter (PDF)</button>
+    <button type="button" class="dml-btn" onclick="generateLetter()" style="margin-top:10px;">Download preapproval letter (PDF)</button>
     <div id="pdf-output" style="display:none;margin-top:12px;"></div>
   </div>
 </div>
