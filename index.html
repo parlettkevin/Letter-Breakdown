@@ -188,11 +188,11 @@ details[open]>*:not(summary){animation:detailsIn 200ms cubic-bezier(0.25,1,0.5,1
   <div class="dml-row">
     <div><label class="dml-label">Seller credit $</label><input type="number" id="seller-credit" value="0" autocomplete="off"></div>
   </div>
-  <details style="margin-top:10px;">
-    <summary style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a07c58;cursor:pointer;">Transfer & recording tax</summary>
+  <div class="dml-check" style="margin-top:10px;"><input type="checkbox" id="fthb"><label for="fthb">First time MD homebuyer (state transfer tax exempt)</label></div>
+  <details style="margin-top:8px;">
+    <summary style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a6840;cursor:pointer;">Transfer & recording tax splits</summary>
     <div style="margin-top:10px;">
-      <div class="dml-check"><input type="checkbox" id="fthb"><label for="fthb">First time MD homebuyer (state transfer tax exempt)</label></div>
-      <div class="dml-row" style="margin-top:8px;">
+      <div class="dml-row" style="margin-top:0;">
         <div><label class="dml-label">County transfer split, buyer %</label><input type="number" id="transfer-split" value="50" autocomplete="off"></div>
         <div><label class="dml-label">Recordation split, buyer %</label><input type="number" id="recordation-split" value="50" autocomplete="off"></div>
       </div>
