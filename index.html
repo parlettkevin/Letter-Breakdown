@@ -917,12 +917,14 @@ function buildCopyText(){
     'PMI/MIP: ' + money(c.miMonthly || 0),
     'HOA: ' + money(c.hoaMonthly || 0),
     '',
-    'CASH TO CLOSE: ' + money(c.cashToClose),
+    'CASH TO CLOSE',
     'Down Payment: ' + money(c.downPayment),
     'Closing Costs: ' + money(grossClosing),
   ];
 
   if (Math.round(credits * 100) > 0) lines.push('Seller Credits: -' + money(credits));
+
+  lines.push('Total Cash to Close: ' + money(c.cashToClose));
 
   return lines.join('\n');
 }
