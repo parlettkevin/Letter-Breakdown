@@ -59,8 +59,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
 .dml-price-wrap input{padding-left:20px!important;}
 .dml-sticky-bar{position:sticky;bottom:0;background:#fff;padding:10px 0 max(env(safe-area-inset-bottom),6px);border-top:1px solid #e7e3da;z-index:10;margin-top:12px;}
 .dml-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-.dml-grid-dates{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
-@media(max-width:380px){.dml-grid-dates{grid-template-columns:1fr 1fr;}}
+.dml-grid-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
 
 /* ── Animations ── */
 @keyframes resultCardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -1257,6 +1256,8 @@ function generateLetter(){
     shareBtn.onclick = () => navigator.share({files:[file], title:fileName}).catch(()=>{});
     box.appendChild(shareBtn);
   }
+
+  requestAnimationFrame(()=>box.scrollIntoView({behavior:'smooth',block:'nearest'}));
 
 }
 
