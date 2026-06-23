@@ -4,12 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DML Quick Quote &amp; Preapproval Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="dml-root">
 <style>
 body{background:#f5f3ef;margin:0;}
-.dml-root{max-width:480px;margin:0 auto;padding:0 0 24px;font-family:-apple-system,'Segoe UI',sans-serif;color:#1d1d1d;}
+.dml-root{max-width:480px;margin:0 auto;padding:0 0 24px;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#1d1d1d;}
 .dml-card{background:#fff;border:1px solid #e7e3da;border-radius:10px;padding:16px;margin-bottom:14px;}
 /* Neutralize the browser's autofill highlight (the gray/yellow tint some
    browsers apply even when a field is otherwise empty of real user data),
@@ -22,30 +25,31 @@ body{background:#f5f3ef;margin:0;}
   box-shadow:0 0 0px 1000px #fff inset;
   transition:background-color 5000s ease-in-out 0s;
 }
-.dml-h{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#9a958a;margin:0 0 10px;}
+.dml-h{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9a958a;margin:0 0 10px;}
 .dml-row{display:flex;gap:10px;margin-bottom:10px;}
 .dml-row>div{flex:1;min-width:0;}
-.dml-label{display:block;font-size:12.5px;color:#5a564d;margin-bottom:4px;}
+.dml-label{display:block;font-size:13px;color:#5a564d;margin-bottom:4px;}
 .dml-card input[type=text],.dml-card input[type=number],.dml-card input[type=date],.dml-card select{
-  width:100%;box-sizing:border-box;padding:8px 9px;border:1px solid #d8d3c6;border-radius:7px;font-size:14.5px;background:#fff;color:#1d1d1d;}
+  width:100%;box-sizing:border-box;padding:8px 9px;border:1px solid #d8d3c6;border-radius:7px;font-size:15px;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#fff;color:#1d1d1d;}
 .dml-card input:focus,.dml-card select:focus{outline:none;border-color:#f4791f;box-shadow:0 0 0 2px rgba(244,121,31,.15);}
-.dml-check{display:flex;align-items:center;gap:8px;font-size:13.5px;color:#3a3730;margin:6px 0;}
+.dml-check{display:flex;align-items:center;gap:8px;font-size:14px;color:#3a3730;margin:6px 0;}
 .dml-check input{width:16px;height:16px;}
 .dml-btn{display:inline-block;width:100%;text-align:center;padding:11px;border-radius:8px;border:none;
-  background:#f4791f;color:#fff;font-size:15px;font-weight:600;cursor:pointer;
+  background:#f4791f;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'Hanken Grotesk',system-ui,sans-serif;
   transition:background .15s ease,transform .1s ease;}
 .dml-btn:hover{background:#e06a16;}
 .dml-btn:active{transform:scale(.99);}
 .dml-btn:focus-visible{outline:2px solid #f4791f;outline-offset:2px;}
 .dml-btn-secondary{background:#faf9f7;color:#3a3730;border:1px solid #d8d3c6;}
 .dml-btn-secondary:hover{background:#f0ede8;border-color:#c8c3b6;}
-.dml-result-row{display:flex;justify-content:space-between;padding:5px 0;font-size:14px;}
-.dml-result-row.total{border-top:1px solid #e7e3da;margin-top:6px;padding-top:8px;font-weight:700;font-size:15px;}
+.dml-result-row{display:flex;justify-content:space-between;padding:5px 0;font-size:14px;font-variant-numeric:tabular-nums;}
+.dml-result-row.total{border-top:1px solid #e7e3da;margin-top:6px;padding-top:10px;font-weight:700;font-size:15px;}
+.dml-result-row.total span:last-child{font-size:18px;letter-spacing:-.02em;}
 .dml-result-label{color:#5a564d;}
-.dml-small{font-size:11.5px;color:#9a958a;margin-top:6px;line-height:1.4;}
+.dml-small{font-size:11px;color:#9a958a;margin-top:6px;line-height:1.4;}
 .dml-small a{color:#c0631a;text-decoration:none;}
 .dml-small a:hover{text-decoration:underline;}
-details.dml-card summary{cursor:pointer;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#9a958a;transition:color .15s ease;}
+details.dml-card summary{cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9a958a;transition:color .15s ease;}
 details.dml-card summary:hover{color:#5a564d;}
 details.dml-card[open] summary{margin-bottom:10px;}
 .dml-check input[type=radio]{accent-color:#f4791f;width:16px;height:16px;}
@@ -122,7 +126,7 @@ details.dml-card[open] summary{margin-bottom:10px;}
   </div>
   <div class="dml-small" id="tax-estimate-note"></div>
   <details style="margin-top:8px;">
-    <summary style="font-size:12.5px;color:#5a564d;cursor:pointer;">Don't have the tax bill? Estimate from assessed value</summary>
+    <summary style="font-size:13px;color:#5a564d;cursor:pointer;">Don't have the tax bill? Estimate from assessed value</summary>
     <div class="dml-row" style="margin-top:10px;">
       <div><label class="dml-label">County</label><select id="county" autocomplete="off" onchange="onCountyChange()"></select></div>
       <div><label class="dml-label">Assessed value $</label><input type="number" id="assessed-value" autocomplete="off"></div>
@@ -138,6 +142,13 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <div><label class="dml-label">Hazard insurance $/mo</label><input type="number" id="hazard-monthly" value="125" autocomplete="off"></div>
     <div><label class="dml-label">HOA $/mo</label><input type="number" id="hoa-monthly" value="0" autocomplete="off"></div>
   </div>
+  <div class="dml-row" style="margin-top:12px;">
+    <div><label class="dml-label">Estimated closing month</label>
+      <select id="closing-month" autocomplete="off"></select>
+    </div>
+    <div><label class="dml-label">Day of month</label><input type="number" id="closing-day" min="1" max="31" autocomplete="off"></div>
+  </div>
+  <div class="dml-small">Drives prepaid interest days, escrow cushion, and property tax deposit.</div>
 </div>
 
 <div class="dml-card">
@@ -167,16 +178,6 @@ details.dml-card[open] summary{margin-bottom:10px;}
   <div class="dml-small">Transfer/recordation tax is auto calculated from the county selected above in the tax section.</div>
 </div>
 
-<div class="dml-card">
-  <p class="dml-h">Closing &amp; escrow timing</p>
-  <div class="dml-row">
-    <div><label class="dml-label">Estimated closing month</label>
-      <select id="closing-month" autocomplete="off"></select>
-    </div>
-    <div><label class="dml-label">Day of month</label><input type="number" id="closing-day" min="1" max="31" autocomplete="off"></div>
-  </div>
-  <div class="dml-small">Drives prepaid interest days, the hazard insurance escrow cushion, and the property tax escrow deposit (sized off Maryland's 7/1 and 12/1 semiannual due dates, RESPA's lowest-balance method).</div>
-</div>
 
 <details class="dml-card">
   <summary>Escrow cushion cap (advanced)</summary>
@@ -185,20 +186,8 @@ details.dml-card[open] summary{margin-bottom:10px;}
   </div>
 </details>
 
-<div class="dml-card">
-  <p class="dml-h">Letter dates</p>
-  <div class="dml-row">
-    <div><label class="dml-label">Letter date</label><input type="date" id="letter-date" autocomplete="off"></div>
-    <div><label class="dml-label">Valid for, days</label><input type="number" id="valid-days" value="90" autocomplete="off"></div>
-  </div>
-  <div class="dml-grid3">
-    <div><label class="dml-label">Income verified</label><input type="date" id="income-date" autocomplete="off"></div>
-    <div><label class="dml-label">Assets verified</label><input type="date" id="assets-date" autocomplete="off"></div>
-    <div><label class="dml-label">Credit verified</label><input type="date" id="credit-date" autocomplete="off"></div>
-  </div>
-</div>
 
-<div id="status-msg" style="display:none;background:#fff4e8;border:1px solid #f4c98a;color:#7a4a10;font-size:13.5px;padding:10px 12px;border-radius:8px;margin-bottom:12px;"></div>
+<div id="status-msg" style="display:none;background:#fff4e8;border:1px solid #f4c98a;color:#7a4a10;font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:12px;"></div>
 
 <div class="dml-sticky-bar">
 <button type="button" class="dml-btn" onclick="calculate()">Calculate</button>
@@ -228,13 +217,13 @@ details.dml-card[open] summary{margin-bottom:10px;}
     <p class="dml-h">Cash to close</p>
     <div class="dml-result-row"><span class="dml-result-label">Closing costs</span><span id="r-closing"></span></div>
     <div class="dml-result-row" style="margin-top:6px;"><span class="dml-result-label" style="font-weight:700;color:#3a3730;">Title &amp; Settlement</span><span id="r-title-settlement-total" style="font-weight:700;"></span></div>
-    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Lender's title</span><span id="r-lender-title"></span></div>
-    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Owner's title</span><span id="r-owner-title"></span></div>
-    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Title examination</span><span id="r-title-exam"></span></div>
-    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Title abstract</span><span id="r-title-abstract"></span></div>
-    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Admin</span><span id="r-admin-fee"></span></div>
-    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Title binder</span><span id="r-title-binder"></span></div>
-    <div class="dml-result-row" style="padding-left:10px;font-size:13.5px;"><span class="dml-result-label">Closing protection letter</span><span id="r-cpl"></span></div>
+    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Lender's title</span><span id="r-lender-title"></span></div>
+    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Owner's title</span><span id="r-owner-title"></span></div>
+    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Title examination</span><span id="r-title-exam"></span></div>
+    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Title abstract</span><span id="r-title-abstract"></span></div>
+    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Admin</span><span id="r-admin-fee"></span></div>
+    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Title binder</span><span id="r-title-binder"></span></div>
+    <div class="dml-result-row" style="padding-left:16px;font-size:13px;"><span class="dml-result-label">Closing protection letter</span><span id="r-cpl"></span></div>
     <div class="dml-result-row" style="margin-top:6px;"><span class="dml-result-label">Transfer taxes</span><span id="r-transfer"></span></div>
     <div class="dml-small" style="margin-bottom:6px;">Includes Maryland state/county transfer taxes and recordation stamps per local jurisdiction rules.</div>
     <div class="dml-result-row"><span class="dml-result-label">Prepaids/reserves</span><span id="r-reserves"></span></div>
@@ -266,7 +255,19 @@ details.dml-card[open] summary{margin-bottom:10px;}
         </select>
       </div>
     </div>
-    <button type="button" class="dml-btn" onclick="generateLetter()" style="margin-top:10px;">Download preapproval letter (PDF)</button>
+    <details style="margin-top:12px;">
+      <summary style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9a958a;cursor:pointer;">Letter dates</summary>
+      <div class="dml-row" style="margin-top:10px;">
+        <div><label class="dml-label">Letter date</label><input type="date" id="letter-date" autocomplete="off"></div>
+        <div><label class="dml-label">Valid for, days</label><input type="number" id="valid-days" value="90" autocomplete="off"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;">
+        <div><label class="dml-label">Income verified</label><input type="date" id="income-date" autocomplete="off"></div>
+        <div><label class="dml-label">Assets verified</label><input type="date" id="assets-date" autocomplete="off"></div>
+        <div><label class="dml-label">Credit verified</label><input type="date" id="credit-date" autocomplete="off"></div>
+      </div>
+    </details>
+    <button type="button" class="dml-btn" onclick="generateLetter()" style="margin-top:12px;">Download preapproval letter (PDF)</button>
     <div id="pdf-output" style="display:none;margin-top:12px;"></div>
   </div>
 </div>
@@ -854,6 +855,7 @@ function renderResults(){
   const c = window.__lastCalc;
   if (!c) return;
   $('results').style.display = '';
+  requestAnimationFrame(()=>$('results').scrollIntoView({behavior:'smooth',block:'start'}));
 
   $('r-price').textContent = money(c.price);
   $('r-down').textContent = money(c.downPayment) + ' (' + pct(c.downPct*100) + '%)';
