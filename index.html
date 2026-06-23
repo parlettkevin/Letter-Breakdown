@@ -100,9 +100,9 @@ details[open]>.dml-summary>.dml-arrow{transform:rotate(90deg);}
     <input type="text" id="p-street" autocomplete="off">
   </div></div>
   <div class="dml-grid3">
-    <div><label class="dml-label">City</label><input type="text" id="p-city" autocomplete="off" autocapitalize="words" oninput="onCityInput()" onblur="titleCaseCity()"></div>
-    <div><label class="dml-label">State</label><input type="text" id="p-state" value="MD" autocomplete="off"></div>
-    <div><label class="dml-label">Zip</label><input type="text" id="p-zip" inputmode="numeric" autocomplete="off" oninput="onZipInput()" placeholder="auto-fills city"></div>
+    <div style="order:3"><label class="dml-label">Zip</label><input type="text" id="p-zip" inputmode="numeric" autocomplete="off" oninput="onZipInput()" placeholder="auto-fills city"></div>
+    <div style="order:1"><label class="dml-label">City</label><input type="text" id="p-city" autocomplete="off" autocapitalize="words" oninput="onCityInput()" onblur="titleCaseCity()"></div>
+    <div style="order:2"><label class="dml-label">State</label><input type="text" id="p-state" value="MD" autocomplete="off"></div>
   </div>
   <div class="dml-small" id="zip-city-note"></div>
   <div class="dml-small" style="margin-top:6px;">Look up assessed value: <a href="https://sdat.dat.maryland.gov/RealProperty/Pages/default.aspx" target="_blank" rel="noopener">MD SDAT Real Property Search</a></div>
